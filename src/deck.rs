@@ -1,10 +1,10 @@
 use super::Package;
+use crate::Error;
 use crate::db_entries::{DeckDbEntry, ModelDbEntry};
 use crate::error::{database_error, json_error};
 use crate::model::Model;
 use crate::note::Note;
-use crate::Error;
-use rusqlite::{params, Transaction};
+use rusqlite::{Transaction, params};
 use std::collections::HashMap;
 use std::ops::RangeFrom;
 

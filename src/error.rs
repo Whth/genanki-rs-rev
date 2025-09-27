@@ -29,7 +29,9 @@ pub enum Error {
     /// client code.
     #[error(transparent)]
     JsonParser(Box<dyn std::error::Error + Send + Sync>),
-    #[error("Could not compute required fields for this template; please check the formatting of \"qfmt\": {0:?}")]
+    #[error(
+        "Could not compute required fields for this template; please check the formatting of \"qfmt\": {0:?}"
+    )]
     TemplateFormat(Tmpl),
     #[error("number of model field ({0}) does not match number of fields ({1})")]
     ModelFieldCountMismatch(usize, usize),

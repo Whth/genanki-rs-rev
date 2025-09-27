@@ -38,9 +38,11 @@ pub fn basic_model() -> Model {
             Field::new("Front").font("Arial"),
             Field::new("Back").font("Arial"),
         ],
-        vec![Template::new("Card 1")
-            .qfmt("{{Front}}")
-            .afmt("{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}")],
+        vec![
+            Template::new("Card 1")
+                .qfmt("{{Front}}")
+                .afmt("{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}"),
+        ],
         Some(
             ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n",
         ),
@@ -262,9 +264,7 @@ pub fn cloze_model() -> Model {
     Model::new_with_options(
         1122529321,
         "Cloze (genanki)",
-        vec![
-            Field::new("Text").font("Arial"),
-        ],
+        vec![Field::new("Text").font("Arial")],
         vec![
             Template::new("Cloze")
                 .qfmt("{{cloze:Text}}")

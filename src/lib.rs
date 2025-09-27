@@ -207,10 +207,13 @@ pub use package::Package;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pyo3::ffi::c_str;
     use pyo3::prelude::*;
-    use serial_test::serial;
-    use std::io::Write;
     use pyo3::types::{PyDict, PyString};
+    use serial_test::serial;
+    use std::ffi::{CStr, CString};
+    use std::io::Write;
+    use std::str::FromStr;
     use tempfile::{NamedTempFile, TempDir, TempPath};
 
     fn model() -> Model {
@@ -218,9 +221,11 @@ mod tests {
             234567,
             "foomodel",
             vec![Field::new("AField"), Field::new("BField")],
-            vec![Template::new("card1")
-                .qfmt("{{AField}}")
-                .afmt(r#"{{FrontSide}}<hr id="answer">{{BField}}"#)],
+            vec![
+                Template::new("card1")
+                    .qfmt("{{AField}}")
+                    .afmt(r#"{{FrontSide}}<hr id="answer">{{BField}}"#),
+            ],
         )
     }
 
@@ -253,9 +258,11 @@ mod tests {
                 Field::new("Hint"),
                 Field::new("Answer"),
             ],
-            vec![Template::new("card1")
-                .qfmt("{{Question}}{{#Hint}}<br>Hint: {{Hint}}{{/Hint}}")
-                .afmt("{{Answer}}")],
+            vec![
+                Template::new("card1")
+                    .qfmt("{{Question}}{{#Hint}}<br>Hint: {{Hint}}{{/Hint}}")
+                    .afmt("{{Answer}}"),
+            ],
         )
     }
 
@@ -275,9 +282,11 @@ mod tests {
             567890,
             "with latex",
             vec![Field::new("AField"), Field::new("Bfield")],
-            vec![Template::new("card1")
-                .qfmt("{{AField}}")
-                .afmt(r#"{{FrontSide}}<hr id="answer">{{BField}}"#)],
+            vec![
+                Template::new("card1")
+                    .qfmt("{{AField}}")
+                    .afmt(r#"{{FrontSide}}<hr id="answer">{{BField}}"#),
+            ],
             None,
             None,
             Some(CUSTOM_LATEX_PRE),
@@ -293,9 +302,11 @@ mod tests {
             567890,
             "with latex",
             vec![Field::new("AField"), Field::new("Bfield")],
-            vec![Template::new("card1")
-                .qfmt("{{AField}}")
-                .afmt(r#"{{FrontSide}}<hr id="answer">{{BField}}"#)],
+            vec![
+                Template::new("card1")
+                    .qfmt("{{AField}}")
+                    .afmt(r#"{{FrontSide}}<hr id="answer">{{BField}}"#),
+            ],
             None,
             None,
             None,
@@ -319,27 +330,17 @@ mod tests {
         \x00\x00?\x00\xd2\xcf \xff\xd9";
 
     pub fn anki_collection<'a>(py: &'a Python, col_fname: &str) -> Bound<'a, PyAny> {
-        let code = r#"
-import anki.collection
-import tempfile
-
-def setup(fname):
-    import uuid
-    colf_name = f"{fname}.anki2"
-    return anki.collection.Collection(colf_name)
-"#;
-        let setup = PyModule::from_code(*py, code.into(), "test_setup".into(), "test_setup.py".into())
+        let code = c_str!(include_str!("../assets/anki_collection.py"));
+        let setup = PyModule::from_code(*py, code, c_str!("test_setup"), c_str!("test_setup.py"))
             .unwrap()
             .to_owned();
-        let col = setup
-            .call1("setup")
-            .unwrap();
+        let col = setup.call_method0("setup").unwrap();
         col
     }
 
     struct TestSetup<'a> {
         py: &'a Python<'a>,
-        col: Bound<'a,PyAny> ,
+        col: Bound<'a, PyAny>,
         col_fname: String,
         tmp_files: Vec<TempPath>,
         _tmp_dirs: Vec<TempDir>,
@@ -347,24 +348,19 @@ def setup(fname):
 
     impl<'a> Drop for TestSetup<'a> {
         fn drop(&mut self) {
-            let code = r#"
-import os
-import time
-import shutil
-def cleanup(fname, col):
-    col.close()
-    path = col.path
-    media = path.split(".anki2")[0] + '.media'
-    os.remove(path)
-    shutil.rmtree(media)
-                "#;
-            let cleanup = PyModule::from_code(*self.py, code.into(), "test_cleanup".into(), "test_cleanup.py".into())
-                .unwrap()
-                .to_owned();
+            let code = c_str!(include_str!("../assets/drop.py"));
+            let cleanup = PyModule::from_code(
+                *self.py,
+                code,
+                c_str!("test_cleanup"),
+                c_str!("test_cleanup.py"),
+            )
+            .unwrap()
+            .to_owned();
             cleanup
                 .call_method1(
                     "cleanup",
-                    (PyString::new(*self.py, &self.col_fname), self.col),
+                    (PyString::new(*self.py, &self.col_fname), self.col.clone()),
                 )
                 .unwrap();
         }
@@ -405,7 +401,7 @@ def cleanup(fname, col):
                 package.write_to_file(out_file.to_str().unwrap()).unwrap();
             }
             let locals = PyDict::new(*self.py);
-            let anki_col = self.col;
+            let anki_col = self.col();
             locals.set_item("col", anki_col).unwrap();
             locals
                 .set_item(
@@ -413,68 +409,53 @@ def cleanup(fname, col):
                     PyString::new(*self.py, out_file.to_str().unwrap()),
                 )
                 .unwrap();
-            let code = r#"
+            let code = c_str!(
+                r#"
 import anki
 import anki.importing.apkg
 importer = anki.importing.apkg.AnkiPackageImporter(col, outfile)
 importer.run()
 res = col
-        "#;
-            self.py.run(code.into(), None, Some(&locals)).unwrap();
+        "#
+            );
+            self.py.run(code, None, Some(&locals)).unwrap();
             let col = locals.get_item("res").unwrap();
             self.col = col.unwrap();
         }
 
         fn check_col(&mut self, condition_str: &str) -> bool {
-            let code = format!(
-                r#"
-def assertion(col):
-    return {}
-        "#,
-                condition_str
-            );
-            let assertion =
-                PyModule::from_code(*self.py, code.into(), "assertion".into(), "assertion.py".into()).unwrap();
-            assertion
-                .call_method1("assertion", (self.col,))
-                .unwrap()
-                .extract()
+            let binding = CString::from_str(condition_str).unwrap();
+            let code = binding.as_c_str();
+            Python::attach(|py| py.eval(code, None, None).unwrap().extract::<bool>())
                 .unwrap()
         }
 
         fn check_media(&self) -> (Vec<String>, Vec<String>, Vec<String>) {
-            let code = r#"
-import os
-def check_media(col):
-    # col.media.check seems to assume that the cwd is the media directory. So this helper function
-    # chdirs to the media dir before running check and then goes back to the original cwd.
-    orig_cwd = os.getcwd()
-    os.chdir(col.media.dir())
-    res = col.media.check()
-    os.chdir(orig_cwd)
-    return res.missing, res.report, res.unused
-            "#;
-            let check = PyModule::from_code(*self.py, code.into(), "check_media".into(), "check_media.py".into())
-                .unwrap()
-                .to_owned();
+            let code = c_str!(include_str!("../assets/check_media.py"));
+            let check = PyModule::from_code(
+                *self.py,
+                code,
+                c_str!("check_media"),
+                c_str!("check_media.py"),
+            )
+            .unwrap()
+            .to_owned();
             check
-                .call_method1("check_media", (self.col,))
+                .call_method1("check_media", (self.col(),))
                 .unwrap()
                 .extract()
                 .unwrap()
         }
 
         fn col(&self) -> Bound<'a, PyAny> {
-            self.col
+            self.col.clone()
         }
     }
 
     #[test]
     #[serial]
     fn import_anki() {
-        Python::attach(
-            |py| assert!(py.import("anki").is_ok())
-        );
+        Python::attach(|py| assert!(py.import("anki").is_ok()));
     }
 
     #[test]
@@ -702,18 +683,19 @@ def check_media(col):
             deck.add_note(note);
             setup.import_package(Package::new(vec![deck], vec![]).unwrap(), None);
             let col = setup.col();
-            let code = r#"
+            let code = c_str!(
+                r#"
 def latex(col, key):
     anki_note = col.getNote(col.find_notes('')[0])
     return anki_note.model()[key]
-                "#;
-            let assertion = PyModule::from_code(py, code.into(), "latex".into(), "latex.py".into())
+                "#
+            );
+            let assertion = PyModule::from_code(py, code, c_str!("latex"), c_str!("latex.py"))
                 .unwrap()
-                .to_owned()
-                ;
+                .to_owned();
             assert_eq!(
                 assertion
-                    .call_method("latex", (&col, PyString::new(py, "latexPre"),),None)
+                    .call_method("latex", (&col, PyString::new(py, "latexPre"),), None)
                     .unwrap()
                     .extract::<String>()
                     .unwrap(),

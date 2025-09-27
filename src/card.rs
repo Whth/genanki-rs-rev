@@ -1,7 +1,7 @@
-use rusqlite::{params, Transaction};
+use rusqlite::{Transaction, params};
 use std::ops::RangeFrom;
 
-use crate::{error::database_error, Error};
+use crate::{Error, error::database_error};
 
 #[derive(Clone)]
 pub struct Card {

@@ -1,10 +1,10 @@
+use crate::Error;
 use crate::card::Card;
 use crate::error::database_error;
 use crate::model::{Model, ModelType};
 use crate::util::guid_for;
-use crate::Error;
 use fancy_regex::Regex;
-use rusqlite::{params, Transaction};
+use rusqlite::{Transaction, params};
 use std::collections::HashSet;
 use std::ops::RangeFrom;
 use std::str::FromStr;
@@ -302,9 +302,11 @@ mod tests {
             1376484377,
             "Simple Model",
             vec![Field::new("Question"), Field::new("Answer")],
-            vec![Template::new("Card 1")
-                .qfmt("{{Question}}")
-                .afmt(r#"{{FrontSide}}<hr id="answer">{{Answer}}"#)],
+            vec![
+                Template::new("Card 1")
+                    .qfmt("{{Question}}")
+                    .afmt(r#"{{FrontSide}}<hr id="answer">{{Answer}}"#),
+            ],
         );
         let my_note = Note::new(my_model, vec!["Capital of Argentina", "Buenos Aires"]).unwrap();
         let db_file = NamedTempFile::new().unwrap().into_temp_path();
@@ -351,9 +353,11 @@ mod tests {
                 Field::new("Answer"),
                 Field::new("Extra"),
             ],
-            vec![Template::new("Card 1")
-                .qfmt("{{Question}}")
-                .afmt(r#"{{FrontSide}}<hr id="answer">{{Answer}}"#)],
+            vec![
+                Template::new("Card 1")
+                    .qfmt("{{Question}}")
+                    .afmt(r#"{{FrontSide}}<hr id="answer">{{Answer}}"#),
+            ],
         );
 
         let note = Note::new(
@@ -384,9 +388,11 @@ mod tests {
                 Field::new("Answer"),
                 Field::new("Extra"),
             ],
-            vec![Template::new("Card 1")
-                .qfmt("{{Question}}")
-                .afmt(r#"{{FrontSide}}<hr id="answer">{{Answer}}"#)],
+            vec![
+                Template::new("Card 1")
+                    .qfmt("{{Question}}")
+                    .afmt(r#"{{FrontSide}}<hr id="answer">{{Answer}}"#),
+            ],
         );
 
         let note = Note::new(model, vec!["Capital of Germany", "Berlin"]).unwrap();
@@ -405,9 +411,11 @@ mod tests {
             1894808898,
             "Test Model",
             vec![Field::new("Question"), Field::new("Answer")],
-            vec![Template::new("Card 1")
-                .qfmt("{{Question}}")
-                .afmt(r#"{{FrontSide}}<hr id="answer">{{Answer}}"#)],
+            vec![
+                Template::new("Card 1")
+                    .qfmt("{{Question}}")
+                    .afmt(r#"{{FrontSide}}<hr id="answer">{{Answer}}"#),
+            ],
         );
 
         let note = Note::new(
