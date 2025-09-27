@@ -11,7 +11,8 @@ on:
 env:
   CARGO_TERM_COLOR: always
   PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
-
+permissions:
+  contents: read
 jobs:
   build-and-test:
     runs-on: ${{ matrix.os }}
@@ -23,12 +24,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-
-      - name: Set up uv with Python ${{ matrix.python-version }}
-        uses: astral-sh/setup-uv@v6
-        with:
-          version: latest
-          python-version: ${{ matrix.python-version }}
 
       - name: Install nightly rust
         run: rustup default nightly
@@ -44,26 +39,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-registry-
 
-      - name: Create virtual environment
-        id: create-venv
-        run: | 
-          uv venv --python ${{ matrix.python-version }}
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_OUTPUT
-        
-
-      - name: install anki
-        run: |
-          uv pip install anki
-        shell: bash
 
       - name: Build
         run: cargo build
 
-      - name: Run tests
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
 
-        env:
-          VIRTUAL_ENV: ${{ steps.create-venv.outputs.VIRTUAL_ENV }}
+      - name: install anki
+        run: |
+          pip install anki
+
+      - name: Run tests
         run: |
           cargo test --lib
-
-        shell: bash
