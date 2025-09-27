@@ -47,7 +47,7 @@ jobs:
       - name: Create virtual environment
         run: uv venv --python ${{ matrix.python-version }}
 
-      - name: Activate venv and install anki
+      - name: install anki
         run: |
           uv pip install anki
         shell: bash
@@ -56,5 +56,9 @@ jobs:
         run: cargo build
 
       - name: Run tests
-        continue-on-error: true
-        run: cargo test --lib
+
+        run: |
+          source .venv/bin/activate
+          cargo test --lib
+
+        shell: bash
