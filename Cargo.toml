@@ -1,27 +1,27 @@
 [package]
-name = "genanki-rs"
-version = "0.4.0"
-authors = ["Yannick Funk <yannickfunk@yahoo.de>"]
-edition = "2018"
+name = "genanki-rs-rev"
+version = "0.1.0"
+authors = ["Yannick Funk <yannickfunk@yahoo.de>", "Whth <zettainspector@foxmail.com>"]
+edition = "2024"
 description = "Crate to create decks for the open source flashcard platform Anki. Based on Python library genanki"
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/yannickfunk/genanki-rs"
+repository = "https://github.com/Whth/genanki-rs-rev"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rusqlite = { version = "0.25.1", features = ["bundled"] }
-tempfile = "3.2.0"
-zip = "0.5.12"
-serde_json = "1.0.64"
-fancy-regex = "0.5.0"
+rusqlite = { version = "0.37.0", features = ["bundled"] }
+tempfile = "3.23.0"
+zip = "5.1.1"
+serde_json = "1.0.145"
+fancy-regex = "0.16.2"
 serde = { version = "1.0", features = ["derive"] }
-ramhorns = "0.10.2"
-thiserror = "1.0.32"
+ramhorns = "1.0.1"
+thiserror = "2.0.16"
 
 [dev-dependencies]
-anyhow = "1.0.62"
-pyo3 = "0.13.2"
-serial_test = "0.5.1"
-uuid = { version = "0.8", features = ["v4"] }
+anyhow = "1.0.100"
+pyo3 = "0.26.0"
+serial_test = "3.2.0"
+uuid = { version = "1.18", features = ["v4"] }
