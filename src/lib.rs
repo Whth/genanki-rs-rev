@@ -211,7 +211,7 @@ mod tests {
     use pyo3::prelude::*;
     use pyo3::types::{PyDict, PyString};
     use serial_test::serial;
-    use std::ffi::{CStr, CString};
+    use std::ffi::{ CString};
     use std::io::Write;
     use std::str::FromStr;
     use tempfile::{NamedTempFile, TempDir, TempPath};
@@ -334,7 +334,7 @@ mod tests {
         let setup = PyModule::from_code(*py, code, c_str!("test_setup"), c_str!("test_setup.py"))
             .unwrap()
             .to_owned();
-        let col = setup.call_method0("setup").unwrap();
+        let col = setup.call_method1("setup",(PyString::new(*py, col_fname),)).unwrap();
         col
     }
 
