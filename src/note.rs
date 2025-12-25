@@ -277,8 +277,8 @@ fn find_invalid_html_tags_in_field(field: &str) -> Vec<String> {
 mod tests {
     use super::*;
     use crate::{Field, Model, Note, Template};
-    use constants::APKG_COL;
-    use constants::APKG_SCHEMA;
+    use crate::constans::APKG_COL;
+    use crate::constans::APKG_SCHEMA;
     use rusqlite::Connection;
     use std::time::{SystemTime, UNIX_EPOCH};
     use tempfile::{NamedTempFile, TempPath};

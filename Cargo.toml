@@ -2,6 +2,7 @@
 name = "genanki-rs-rev"
 version = "0.1.2"
 edition = "2024"
+license-file = "LICENSE"
 description = "Crate to create decks for the open source flashcard platform Anki. Based on Python library genanki"
 readme = "README.md"
 repository = "https://github.com/Whth/genanki-rs-rev"
@@ -16,7 +17,6 @@ fancy-regex = "0.17.0"
 serde = { version = "1.0", features = ["derive"] }
 ramhorns = "1.0.1"
 thiserror = "2.0.17"
-constants = { path = "crates/constants", version = "0.1.0" }
 blake3 = { version = "1.8.2" }
 hex = "0.4.3"
 
@@ -27,9 +27,4 @@ serial_test = "3.2.0"
 uuid = { version = "1.19", features = ["v4"] }
 
 
-[workspace]
-members = ["crates/*"]
 
-[workspace.package]
-authors = ["Yannick Funk <yannickfunk@yahoo.de>", "Whth <zettainspector@foxmail.com>"]
-license-file = "LICENSE"

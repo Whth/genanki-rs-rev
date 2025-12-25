@@ -10,8 +10,8 @@ use std::path::{Path, PathBuf};
 
 use crate::Result;
 use crate::deck::Deck;
-use constants::APKG_COL;
-use constants::APKG_SCHEMA;
+use crate::constans::APKG_COL;
+use crate::constans::APKG_SCHEMA;
 
 /// `Package` to pack `Deck`s and `media_files` and write them to a `.apkg` file
 ///
