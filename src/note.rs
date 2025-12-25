@@ -169,7 +169,7 @@ impl Note {
             .execute(
                 "INSERT INTO notes VALUES(?,?,?,?,?,?,?,?,?,?,?);",
                 params![
-                    id_gen.next(),        // id
+                    id_gen.next().expect("Range overflowed!") as i64,        // id
                     self.get_guid(),      // guid
                     self.model.id,        // mid
                     timestamp as i64,     // mod

@@ -30,8 +30,8 @@ impl Card {
             .execute(
                 "INSERT INTO cards VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
                 params![
-                    id_gen.next(),    // id
-                    note_id,          // nid
+                    id_gen.next().expect("Range overflowed!") as i64,    // id
+                    note_id as i64,          // nid
                     deck_id,          // did
                     self.ord,         // ord
                     timestamp as i64, // mod
