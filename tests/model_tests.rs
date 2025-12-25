@@ -19,7 +19,7 @@ fn css() -> String {
  color: lightblue;
 }
 "#
-        .to_owned()
+    .to_owned()
 }
 
 fn cloze_model() -> Model {

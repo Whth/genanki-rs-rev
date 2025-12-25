@@ -32,7 +32,10 @@ impl Note {
     /// let note = Note::new(basic_model(), vec!["What is the capital of France?", "Paris"]);
     /// ```
     pub fn new(model: Model, fields: Vec<&str>) -> Result<Self> {
-        let fields = fields.iter().map(|&s| s.to_string()).collect();
+        let fields = fields
+            .iter()
+            .map(|&s| s.to_string())
+            .collect::<Vec<String>>();
         let cards = match model.get_model_type() {
             ModelType::FrontBack => front_back_cards(&model, &fields)?,
             ModelType::Cloze => cloze_cards(&model, &fields),
@@ -65,9 +68,12 @@ impl Note {
             .unwrap_or_default()
             .iter()
             .map(|s| s.to_string())
-            .collect();
+            .collect::<Vec<String>>();
         validate_tags(&tags)?;
-        let fields = fields.iter().map(|s| s.to_string()).collect();
+        let fields = fields
+            .iter()
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>();
         let cards = match model.get_model_type() {
             ModelType::FrontBack => front_back_cards(&model, &fields)?,
             ModelType::Cloze => cloze_cards(&model, &fields),
@@ -116,7 +122,6 @@ impl Note {
         self.model.clone()
     }
 
-    #[allow(dead_code)]
     pub fn cards(&self) -> Vec<Card> {
         self.cards.clone()
     }
@@ -161,7 +166,7 @@ impl Note {
         transaction: &Transaction,
         timestamp: f64,
         deck_id: i64,
-        mut id_gen: &mut RangeFrom<usize>,
+        id_gen: &mut RangeFrom<usize>,
     ) -> Result<()> {
         self.check_number_model_fields_matches_num_fields()?;
         self.check_invalid_html_tags_in_fields()?;
@@ -183,13 +188,13 @@ impl Note {
         )?;
         let note_id = transaction.last_insert_rowid() as usize;
         for card in &self.cards {
-            card.write_to_db(transaction, timestamp, deck_id, note_id, &mut id_gen)?
+            card.write_to_db(transaction, timestamp, deck_id, note_id, id_gen)?
         }
         Ok(())
     }
 }
 
-fn cloze_cards(model: &Model, self_fields: &Vec<String>) -> Vec<Card> {
+fn cloze_cards(model: &Model, self_fields: &[String]) -> Vec<Card> {
     let mut card_ords: HashSet<i64> = HashSet::new();
     let mut cloze_replacements: HashSet<String> = HashSet::new();
     cloze_replacements.extend(re_findall(
@@ -225,13 +230,13 @@ fn cloze_cards(model: &Model, self_fields: &Vec<String>) -> Vec<Card> {
         .collect()
 }
 
-fn front_back_cards(model: &Model, self_fields: &Vec<String>) -> Result<Vec<Card>> {
+fn front_back_cards(model: &Model, self_fields: &[String]) -> Result<Vec<Card>> {
     let mut rv = vec![];
     for (card_ord, any_or_all, required_field_ords) in model.req()?.drain(..) {
         let mut iter = required_field_ords.iter().map(|&ord| &self_fields[ord]);
         let condition = match any_or_all.as_str() {
-            "any" => iter.any(|field| field.len() > 0),
-            "all" => iter.all(|field| field.len() > 0),
+            "any" => iter.any(String::is_empty),
+            "all" => iter.all(String::is_empty),
             _ => panic!("only any or all"),
         };
         if condition {
@@ -246,18 +251,17 @@ fn re_findall(regex_str: &'static str, to_match: &str) -> Vec<String> {
     regex
         .captures_iter(to_match)
         .filter_map(|m| m.ok())
-        .map(|cap| {
+        .flat_map(|cap| {
             cap.iter()
                 .skip(1)
-                .filter_map(|m| m)
+                .flatten()
                 .map(|m| m.as_str().to_string())
                 .collect::<Vec<String>>()
         })
-        .flatten()
         .collect()
 }
 
-fn validate_tags(tags: &Vec<String>) -> Result<()> {
+fn validate_tags(tags: &[String]) -> Result<()> {
     if tags.iter().any(|tag| tag.contains(' ')) {
         Err(Error::TagContainsWhitespace)
     } else {
@@ -272,5 +276,3 @@ fn find_invalid_html_tags_in_field(field: &str) -> Vec<String> {
         .map(|m| m.unwrap().as_str().to_string())
         .collect()
 }
-
-

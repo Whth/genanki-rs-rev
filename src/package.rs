@@ -9,9 +9,9 @@ use std::io::{Read, Seek, Write};
 use std::path::{Path, PathBuf};
 
 use crate::Result;
-use crate::deck::Deck;
 use crate::constants::APKG_COL;
 use crate::constants::APKG_SCHEMA;
+use crate::deck::Deck;
 
 /// `Package` to pack `Deck`s and `media_files` and write them to a `.apkg` file
 ///
@@ -141,7 +141,7 @@ impl Package {
         transaction.execute_batch(APKG_SCHEMA)?;
         transaction.execute_batch(APKG_COL)?;
         for deck in &mut self.decks {
-            deck.write_to_db(&transaction, timestamp, &mut id_gen)?;
+            deck.write_to_db(transaction, timestamp, &mut id_gen)?;
         }
         Ok(())
     }

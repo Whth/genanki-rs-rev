@@ -66,16 +66,16 @@ impl Template {
     }
 }
 
-impl Into<Tmpl> for Template {
-    fn into(self) -> Tmpl {
+impl From<Template> for Tmpl {
+    fn from(template: Template) -> Self {
         Tmpl {
-            name: self.name,
-            qfmt: self.qfmt.unwrap_or("".to_string()),
-            did: self.did,
-            bafmt: self.bafmt.unwrap_or("".to_string()),
-            afmt: self.afmt.unwrap_or("".to_string()),
+            name: template.name,
+            qfmt: template.qfmt.unwrap_or_default(),
+            did: template.did,
+            bafmt: template.bafmt.unwrap_or_default(),
+            afmt: template.afmt.unwrap_or_default(),
             ord: 0,
-            bqfmt: self.bqfmt.unwrap_or("".to_string()),
+            bqfmt: template.bqfmt.unwrap_or_default(),
         }
     }
 }

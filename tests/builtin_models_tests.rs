@@ -1,13 +1,15 @@
-use genanki_rs_rev::{basic_and_reversed_card_model, basic_model, basic_optional_reversed_card_model, basic_type_in_the_answer_model, cloze_model, Deck, Note};
+use genanki_rs_rev::{
+    Deck, Note, basic_and_reversed_card_model, basic_model, basic_optional_reversed_card_model,
+    basic_type_in_the_answer_model, cloze_model,
+};
 use tempfile::NamedTempFile;
 
 #[test]
 fn builtin_models() {
     let mut my_deck = Deck::new(1598559905, "Country Capitals", "");
 
-    my_deck.add_note(
-        Note::new(basic_model(), vec!["Capital of Argentina", "Buenos Aires"]).unwrap(),
-    );
+    my_deck
+        .add_note(Note::new(basic_model(), vec!["Capital of Argentina", "Buenos Aires"]).unwrap());
     my_deck.add_note(
         Note::new(
             basic_and_reversed_card_model(),
@@ -22,9 +24,8 @@ fn builtin_models() {
         )
         .unwrap(),
     );
-    my_deck.add_note(
-        Note::new(basic_type_in_the_answer_model(), vec!["Taiwan", "Taipei"]).unwrap(),
-    );
+    my_deck
+        .add_note(Note::new(basic_type_in_the_answer_model(), vec!["Taiwan", "Taipei"]).unwrap());
     my_deck.add_note(
         Note::new(
             cloze_model(),

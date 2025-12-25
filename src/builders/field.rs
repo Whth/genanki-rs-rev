@@ -64,16 +64,16 @@ impl Field {
     }
 }
 
-impl Into<Fld> for Field {
-    fn into(self) -> Fld {
+impl From<Field> for Fld {
+    fn from(field: Field) -> Self {
         Fld {
-            name: self.name.to_string(),
+            name: field.name.to_string(),
             media: vec![],
-            sticky: self.sticky.unwrap_or(false),
-            rtl: self.rtl.unwrap_or(false),
+            sticky: field.sticky.unwrap_or(false),
+            rtl: field.rtl.unwrap_or(false),
             ord: 0,
-            font: self.font.unwrap_or("Liberation Sans".to_string()),
-            size: self.size.unwrap_or(20),
+            font: field.font.unwrap_or("Liberation Sans".to_string()),
+            size: field.size.unwrap_or(20),
         }
     }
 }

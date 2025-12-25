@@ -24,7 +24,7 @@ pub enum Error {
     #[error(
         "Could not compute required fields for this template; please check the formatting of \"qfmt\": {0:?}"
     )]
-    TemplateFormat(Tmpl),
+    TemplateFormat(Box<Tmpl>),
     #[error("number of model field ({0}) does not match number of fields ({1})")]
     ModelFieldCountMismatch(usize, usize),
     #[error("One of the tags contains whitespace, this is not allowed!")]

@@ -158,8 +158,7 @@ impl Model {
             .map(|field| (field.as_str(), format!("{}{}", &field, &sentinel)));
         let mut req = Vec::new();
         for (template_ord, template) in self.templates.iter().enumerate() {
-            let rendered = RamTemplate::new(template.qfmt.clone())
-                ?
+            let rendered = RamTemplate::new(template.qfmt.clone())?
                 .render::<HashMap<&str, String>>(&field_values.clone().collect());
             let required_fields = field_values
                 .clone()
@@ -178,7 +177,7 @@ impl Model {
                 .map(|(field_ord, _)| field_ord)
                 .collect::<Vec<_>>();
             if required_fields.is_empty() {
-                return Err(Error::TemplateFormat(template.clone()));
+                return Err(Error::TemplateFormat(Box::new(template.clone())));
             }
             req.push((template_ord, "any".to_string(), required_fields))
         }
@@ -220,7 +219,7 @@ impl Model {
             usn: -1,
             req: self.req()?.clone(),
             flds: self.fields.clone(),
-            sortf: self.sort_field_index.clone(),
+            sortf: self.sort_field_index,
             tmpls: self.templates.clone(),
             model_db_entry_mod: timestamp as i64,
             latex_post: self.latex_post.clone(),
@@ -229,13 +228,6 @@ impl Model {
             css: self.css.clone(),
             latex_pre: self.latex_pre.clone(),
         })
-    }
-
-    #[allow(dead_code)]
-    pub(super) fn to_json(&mut self, timestamp: f64, deck_id: i64) -> Result<String> {
-        Ok(serde_json::to_string(
-            &self.to_model_db_entry(timestamp, deck_id)?,
-        )?)
     }
 }
 
@@ -249,5 +241,3 @@ fn contains_other_fields(rendered: &str, current_field: &str, sentinel: &str) ->
         .is_match(rendered)
         .unwrap()
 }
-
-

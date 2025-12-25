@@ -280,5 +280,3 @@ pub fn cloze_model() -> Model {
         None,
     )
 }
-
-

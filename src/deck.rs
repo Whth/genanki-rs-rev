@@ -57,7 +57,7 @@ impl Deck {
             deck_db_entry_dyn: 0,
             extend_new: 0,
             extend_rev: 50,
-            id: self.id.clone(),
+            id: self.id,
             lrn_today: vec![163, 2],
             deck_db_entry_mod: 1425278051,
             name: self.name.clone(),
@@ -68,11 +68,6 @@ impl Deck {
         }
     }
 
-    #[allow(dead_code)]
-    fn to_json(&self) -> String {
-        let db_entry: DeckDbEntry = self.to_deck_db_entry();
-        serde_json::to_string(&db_entry).expect("Should always serialize")
-    }
 
     pub(super) fn write_to_db(
         &mut self,
@@ -103,7 +98,7 @@ impl Deck {
             [serde_json::to_string(&models)?],
         )?;
         for note in &mut self.notes {
-            note.write_to_db(&transaction, timestamp, self.id, id_gen)?;
+            note.write_to_db(transaction, timestamp, self.id, id_gen)?;
         }
         Ok(())
     }

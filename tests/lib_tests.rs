@@ -107,8 +107,7 @@ fn model_with_sort_field_index() -> Model {
     )
 }
 
-const VALID_MP3: &[u8] =
-    b"\xff\xe3\x18\xc4\x00\x00\x00\x03H\x00\x00\x00\x00LAME3.98.2\x00\x00\x00\
+const VALID_MP3: &[u8] = b"\xff\xe3\x18\xc4\x00\x00\x00\x03H\x00\x00\x00\x00LAME3.98.2\x00\x00\x00\
         \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\
         \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\
         \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
@@ -149,8 +148,8 @@ impl<'a> Drop for TestSetup<'a> {
             c_str!("test_cleanup"),
             c_str!("test_cleanup.py"),
         )
-            .unwrap()
-            .to_owned();
+        .unwrap()
+        .to_owned();
         cleanup
             .call_method1(
                 "cleanup",
@@ -231,8 +230,8 @@ res = col
             c_str!("check_media"),
             c_str!("check_media.py"),
         )
-            .unwrap()
-            .to_owned();
+        .unwrap()
+        .to_owned();
         check
             .call_method1("check_media", (self.col(),))
             .unwrap()
@@ -337,12 +336,12 @@ fn note_generate_cards_based_on_req_with_hint() {
         model_with_hint(),
         vec!["capital of California", "", "Sacramento"],
     )
-        .unwrap();
+    .unwrap();
     let note2 = Note::new(
         model_with_hint(),
         vec!["capital of Iowa", "French for \"The Moines\"", "Des Moines"],
     )
-        .unwrap();
+    .unwrap();
 
     assert_eq!(note1.cards().len(), 1);
     assert_eq!(note1.cards()[0].ord(), 0);
@@ -364,7 +363,7 @@ fn media_files() {
             r#"answer <img src="present.jpg"> <img src="missing.jpg">"#,
         ],
     )
-        .unwrap();
+    .unwrap();
     deck.add_note(note);
     std::fs::File::create("present.mp3")
         .unwrap()
@@ -405,7 +404,7 @@ fn media_files_absolute_paths() {
             r#"answer <img src="present.jpg"> <img src="missing.jpg">"#,
         ],
     )
-        .unwrap();
+    .unwrap();
     deck.add_note(note);
     let present_mp3_path = tmp_dir.path().join("present.mp3");
     let present_jpg_path = tmp_dir.path().join("present.jpg");
@@ -426,8 +425,7 @@ fn media_files_absolute_paths() {
                     present_mp3_path.to_str().unwrap(),
                     present_jpg_path.to_str().unwrap(),
                 ],
-            )
-            ,
+            ),
             None,
         );
         let (missing, _, _) = setup.check_media();
@@ -460,9 +458,7 @@ fn card_added_date_is_recent() {
         let note = Note::new(model(), vec!["a", "b"]).unwrap();
         deck.add_note(note);
         setup.import_package(Package::new(vec![deck], vec![]), None);
-        assert!(
-            setup.check_col("col.getNote(col.find_notes('')[0]).cards()[0].id > 1577836800000")
-        )
+        assert!(setup.check_col("col.getNote(col.find_notes('')[0]).cards()[0].id > 1577836800000"))
     });
 }
 
@@ -496,7 +492,7 @@ def latex(col, key):
         );
         assert_eq!(
             assertion
-                .call_method("latex", (col, PyString::new(py, "latexPost"),), None, )
+                .call_method("latex", (col, PyString::new(py, "latexPost"),), None,)
                 .unwrap()
                 .extract::<String>()
                 .unwrap(),

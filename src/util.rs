@@ -1,5 +1,3 @@
-use blake3;
-
 /// Generates a GUID based on the provided fields.
 ///
 /// This function combines the input fields using an ASCII unit separator (`\x1F`)
