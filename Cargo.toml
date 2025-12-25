@@ -16,8 +16,8 @@ fancy-regex = "0.17.0"
 serde = { version = "1.0", features = ["derive"] }
 ramhorns = "1.0.1"
 thiserror = "2.0.17"
-constants = {path = "crates/constants"}
-blake3 = { version = "1.8.2", features = ["rayon"] }
+constants = { path = "crates/constants", version = "0.1.0" }
+blake3 = { version = "1.8.2" }
 hex = "0.4.3"
 
 [dev-dependencies]
