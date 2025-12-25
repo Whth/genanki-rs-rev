@@ -8,12 +8,10 @@ use std::fs::File;
 use std::io::{Read, Seek, Write};
 use std::path::{Path, PathBuf};
 
-use crate::Error;
-use crate::apkg_col::APKG_COL;
-use crate::apkg_schema::APKG_SCHEMA;
+use crate::Result;
 use crate::deck::Deck;
-use crate::error::{database_error, json_error, zip_error};
-use std::str::FromStr;
+use constants::APKG_COL;
+use constants::APKG_SCHEMA;
 
 /// `Package` to pack `Deck`s and `media_files` and write them to a `.apkg` file
 ///
@@ -50,32 +48,28 @@ impl Package {
     /// Create a new package with `decks` and `media_files`
     ///
     /// Returns `Err` if `media_files` are invalid
-    pub fn new(decks: Vec<Deck>, media_files: Vec<&str>) -> Result<Self, Error> {
+    pub fn new(decks: Vec<Deck>, media_files: Vec<&str>) -> Self {
         let media_files = media_files
             .iter()
-            .map(|&s| PathBuf::from_str(s))
-            .collect::<Result<Vec<_>, _>>()?;
-        Ok(Self { decks, media_files })
+            .map(|&s| PathBuf::from(s))
+            .collect::<Vec<_>>();
+        Self { decks, media_files }
     }
 
     /// Writes the package to any writer that implements Write and Seek
-    pub fn write<W: Write + Seek>(&mut self, writer: W) -> Result<(), Error> {
+    pub fn write<W: Write + Seek>(&mut self, writer: W) -> Result<()> {
         self.write_maybe_timestamp(writer, None)
     }
 
     /// Writes the package to any writer that implements Write and Seek using a timestamp
-    pub fn write_timestamp<W: Write + Seek>(
-        &mut self,
-        writer: W,
-        timestamp: f64,
-    ) -> Result<(), Error> {
+    pub fn write_timestamp<W: Write + Seek>(&mut self, writer: W, timestamp: f64) -> Result<()> {
         self.write_maybe_timestamp(writer, Some(timestamp))
     }
 
     /// Writes the package to a file
     ///
     /// Returns `Err` if the `file` cannot be created
-    pub fn write_to_file(&mut self, file: &str) -> Result<(), Error> {
+    pub fn write_to_file(&mut self, file: &str) -> Result<()> {
         let file = File::create(file)?;
         self.write_maybe_timestamp(file, None)
     }
@@ -83,7 +77,7 @@ impl Package {
     /// Writes the package to a file using a timestamp
     ///
     /// Returns `Err` if the `file` cannot be created
-    pub fn write_to_file_timestamp(&mut self, file: &str, timestamp: f64) -> Result<(), Error> {
+    pub fn write_to_file_timestamp(&mut self, file: &str, timestamp: f64) -> Result<()> {
         let file = File::create(file)?;
         self.write_maybe_timestamp(file, Some(timestamp))
     }
@@ -92,11 +86,11 @@ impl Package {
         &mut self,
         writer: W,
         timestamp: Option<f64>,
-    ) -> Result<(), Error> {
+    ) -> Result<()> {
         let db_file = NamedTempFile::new()?.into_temp_path();
 
-        let mut conn = Connection::open(&db_file).map_err(database_error)?;
-        let transaction = conn.transaction().map_err(database_error)?;
+        let mut conn = Connection::open(&db_file)?;
+        let transaction = conn.transaction()?;
 
         let timestamp = if let Some(timestamp) = timestamp {
             timestamp
@@ -105,13 +99,11 @@ impl Package {
         };
 
         self.write_to_db(&transaction, timestamp)?;
-        transaction.commit().map_err(database_error)?;
+        transaction.commit()?;
         conn.close().expect("Should always close");
 
         let mut outzip = ZipWriter::new(writer);
-        outzip
-            .start_file::<&str, ()>("collection.anki2", FileOptions::default())
-            .map_err(zip_error)?;
+        outzip.start_file::<&str, ()>("collection.anki2", FileOptions::default())?;
         outzip.write_all(&read_file_bytes(db_file)?)?;
 
         let media_file_idx_to_path = self
@@ -132,30 +124,22 @@ impl Package {
                 )
             })
             .collect::<HashMap<String, &str>>();
-        let media_json = serde_json::to_string(&media_map).map_err(json_error)?;
-        outzip
-            .start_file::<&str, ()>("media", FileOptions::default())
-            .map_err(zip_error)?;
+        let media_json = serde_json::to_string(&media_map)?;
+        outzip.start_file::<&str, ()>("media", FileOptions::default())?;
         outzip.write_all(media_json.as_bytes())?;
 
         for (idx, &path) in &media_file_idx_to_path {
-            outzip
-                .start_file::<_, ()>(idx.to_string(), FileOptions::default())
-                .map_err(zip_error)?;
+            outzip.start_file::<_, ()>(idx.to_string(), FileOptions::default())?;
             outzip.write_all(&read_file_bytes(path)?)?;
         }
-        outzip.finish().map_err(zip_error)?;
+        outzip.finish()?;
         Ok(())
     }
 
-    fn write_to_db(&mut self, transaction: &Transaction, timestamp: f64) -> Result<(), Error> {
+    fn write_to_db(&mut self, transaction: &Transaction, timestamp: f64) -> Result<()> {
         let mut id_gen = ((timestamp * 1000.0) as usize)..;
-        transaction
-            .execute_batch(APKG_SCHEMA)
-            .map_err(database_error)?;
-        transaction
-            .execute_batch(APKG_COL)
-            .map_err(database_error)?;
+        transaction.execute_batch(APKG_SCHEMA)?;
+        transaction.execute_batch(APKG_COL)?;
         for deck in &mut self.decks {
             deck.write_to_db(&transaction, timestamp, &mut id_gen)?;
         }
@@ -163,7 +147,7 @@ impl Package {
     }
 }
 
-fn read_file_bytes<P: AsRef<Path>>(path: P) -> Result<Vec<u8>, Error> {
+fn read_file_bytes<P: AsRef<Path>>(path: P) -> Result<Vec<u8>> {
     let mut handle = File::open(path)?;
     let mut data = Vec::new();
     handle.read_to_end(&mut data)?;

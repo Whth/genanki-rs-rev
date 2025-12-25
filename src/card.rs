@@ -1,7 +1,7 @@
 use rusqlite::{Transaction, params};
 use std::ops::RangeFrom;
 
-use crate::{Error, error::database_error};
+use crate::error::Result;
 
 #[derive(Clone)]
 pub struct Card {
@@ -17,40 +17,40 @@ impl Card {
     pub fn ord(&self) -> i64 {
         self.ord
     }
+
     pub fn write_to_db(
         &self,
         transaction: &Transaction,
         timestamp: f64,
         deck_id: i64,
         note_id: usize,
+
         id_gen: &mut RangeFrom<usize>,
-    ) -> Result<(), Error> {
+    ) -> Result<()> {
         let queue = if self.suspend { -1 } else { 0 };
-        transaction
-            .execute(
-                "INSERT INTO cards VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
-                params![
-                    id_gen.next().expect("Range overflowed!") as i64, // id
-                    note_id as i64,                                   // nid
-                    deck_id,                                          // did
-                    self.ord,                                         // ord
-                    timestamp as i64,                                 // mod
-                    -1,                                               // usn
-                    0,                                                // type (=0 for non-Cloze)
-                    queue,                                            // queue
-                    0,                                                // due
-                    0,                                                // ivl
-                    0,                                                // factor
-                    0,                                                // reps
-                    0,                                                // lapses
-                    0,                                                // left
-                    0,                                                // odue
-                    0,                                                // odid
-                    0,                                                // flags
-                    "",                                               // data
-                ],
-            )
-            .map_err(database_error)?;
+        transaction.execute(
+            "INSERT INTO cards VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
+            params![
+                id_gen.next().expect("Range overflowed!") as i64, // id
+                note_id as i64,                                   // nid
+                deck_id,                                          // did
+                self.ord,                                         // ord
+                timestamp as i64,                                 // mod
+                -1,                                               // usn
+                0,                                                // type (=0 for non-Cloze)
+                queue,                                            // queue
+                0,                                                // due
+                0,                                                // ivl
+                0,                                                // factor
+                0,                                                // reps
+                0,                                                // lapses
+                0,                                                // left
+                0,                                                // odue
+                0,                                                // odid
+                0,                                                // flags
+                "",                                               // data
+            ],
+        )?;
         Ok(())
     }
 }

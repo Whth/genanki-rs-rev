@@ -1,6 +1,6 @@
 use crate::Error;
 use crate::card::Card;
-use crate::error::database_error;
+use crate::error::Result;
 use crate::model::{Model, ModelType};
 use crate::util::guid_for;
 use fancy_regex::Regex;
@@ -31,7 +31,7 @@ impl Note {
     ///
     /// let note = Note::new(basic_model(), vec!["What is the capital of France?", "Paris"]);
     /// ```
-    pub fn new(model: Model, fields: Vec<&str>) -> Result<Self, Error> {
+    pub fn new(model: Model, fields: Vec<&str>) -> Result<Self> {
         let fields = fields.iter().map(|&s| s.to_string()).collect();
         let cards = match model.get_model_type() {
             ModelType::FrontBack => front_back_cards(&model, &fields)?,
@@ -60,7 +60,7 @@ impl Note {
         sort_field: Option<bool>,
         tags: Option<Vec<&str>>,
         guid: Option<&str>,
-    ) -> Result<Self, Error> {
+    ) -> Result<Self> {
         let tags = tags
             .unwrap_or_default()
             .iter()
@@ -125,7 +125,7 @@ impl Note {
         self.guid.clone()
     }
 
-    fn check_number_model_fields_matches_num_fields(&self) -> Result<(), Error> {
+    fn check_number_model_fields_matches_num_fields(&self) -> Result<()> {
         if self.model.fields().len() != self.fields.len() {
             Err(Error::ModelFieldCountMismatch(
                 self.model.fields().len(),
@@ -136,7 +136,7 @@ impl Note {
         }
     }
 
-    fn check_invalid_html_tags_in_fields(&self) -> Result<(), Error> {
+    fn check_invalid_html_tags_in_fields(&self) -> Result<()> {
         for field in &self.fields {
             let invalid_tags = find_invalid_html_tags_in_field(field);
             if !invalid_tags.is_empty() {
@@ -162,27 +162,25 @@ impl Note {
         timestamp: f64,
         deck_id: i64,
         mut id_gen: &mut RangeFrom<usize>,
-    ) -> Result<(), Error> {
+    ) -> Result<()> {
         self.check_number_model_fields_matches_num_fields()?;
         self.check_invalid_html_tags_in_fields()?;
-        transaction
-            .execute(
-                "INSERT INTO notes VALUES(?,?,?,?,?,?,?,?,?,?,?);",
-                params![
-                    id_gen.next().expect("Range overflowed!") as i64, // id
-                    self.get_guid(),                                  // guid
-                    self.model.id,                                    // mid
-                    timestamp as i64,                                 // mod
-                    -1,                                               // usn
-                    self.format_tags(),                               // TODO tags
-                    self.format_fields(),                             // flds
-                    self.sort_field,                                  // sfld
-                    0,                                                // csum, can be ignored
-                    0,                                                // flags
-                    "",                                               // data
-                ],
-            )
-            .map_err(database_error)?;
+        transaction.execute(
+            "INSERT INTO notes VALUES(?,?,?,?,?,?,?,?,?,?,?);",
+            params![
+                id_gen.next().expect("Range overflowed!") as i64, // id
+                self.get_guid(),                                  // guid
+                self.model.id,                                    // mid
+                timestamp as i64,                                 // mod
+                -1,                                               // usn
+                self.format_tags(),                               // TODO tags
+                self.format_fields(),                             // flds
+                self.sort_field,                                  // sfld
+                0,                                                // csum, can be ignored
+                0,                                                // flags
+                "",                                               // data
+            ],
+        )?;
         let note_id = transaction.last_insert_rowid() as usize;
         for card in &self.cards {
             card.write_to_db(transaction, timestamp, deck_id, note_id, &mut id_gen)?
@@ -227,7 +225,7 @@ fn cloze_cards(model: &Model, self_fields: &Vec<String>) -> Vec<Card> {
         .collect()
 }
 
-fn front_back_cards(model: &Model, self_fields: &Vec<String>) -> Result<Vec<Card>, Error> {
+fn front_back_cards(model: &Model, self_fields: &Vec<String>) -> Result<Vec<Card>> {
     let mut rv = vec![];
     for (card_ord, any_or_all, required_field_ords) in model.req()?.drain(..) {
         let mut iter = required_field_ords.iter().map(|&ord| &self_fields[ord]);
@@ -259,7 +257,7 @@ fn re_findall(regex_str: &'static str, to_match: &str) -> Vec<String> {
         .collect()
 }
 
-fn validate_tags(tags: &Vec<String>) -> Result<(), Error> {
+fn validate_tags(tags: &Vec<String>) -> Result<()> {
     if tags.iter().any(|tag| tag.contains(' ')) {
         Err(Error::TagContainsWhitespace)
     } else {
@@ -278,9 +276,9 @@ fn find_invalid_html_tags_in_field(field: &str) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::apkg_col::APKG_COL;
-    use crate::apkg_schema::APKG_SCHEMA;
     use crate::{Field, Model, Note, Template};
+    use constants::APKG_COL;
+    use constants::APKG_SCHEMA;
     use rusqlite::Connection;
     use std::time::{SystemTime, UNIX_EPOCH};
     use tempfile::{NamedTempFile, TempPath};

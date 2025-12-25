@@ -1,11 +1,10 @@
 use crate::builders::Template;
 use crate::db_entries::{Fld, ModelDbEntry, Tmpl};
-use crate::error::{json_error, template_error};
+use crate::error::Result;
 use crate::{Error, Field};
 use fancy_regex::Regex;
 use ramhorns::Template as RamTemplate;
 use std::collections::HashMap;
-
 const DEFAULT_LATEX_PRE: &str = r#"
 \documentclass[12pt]{article}
 \special{papersize=3in,5in}
@@ -151,7 +150,7 @@ impl Model {
         }
     }
 
-    pub(super) fn req(&self) -> Result<Vec<(usize, String, Vec<usize>)>, Error> {
+    pub(super) fn req(&self) -> Result<Vec<(usize, String, Vec<usize>)>> {
         let sentinel = "SeNtInEl".to_string();
         let field_names: Vec<String> = self.fields.iter().map(|field| field.name.clone()).collect();
         let field_values = field_names
@@ -160,7 +159,7 @@ impl Model {
         let mut req = Vec::new();
         for (template_ord, template) in self.templates.iter().enumerate() {
             let rendered = RamTemplate::new(template.qfmt.clone())
-                .map_err(template_error)?
+                ?
                 .render::<HashMap<&str, String>>(&field_values.clone().collect());
             let required_fields = field_values
                 .clone()
@@ -199,7 +198,7 @@ impl Model {
         &mut self,
         timestamp: f64,
         deck_id: i64,
-    ) -> Result<ModelDbEntry, Error> {
+    ) -> Result<ModelDbEntry> {
         self.templates
             .iter_mut()
             .enumerate()
@@ -233,11 +232,10 @@ impl Model {
     }
 
     #[allow(dead_code)]
-    pub(super) fn to_json(&mut self, timestamp: f64, deck_id: i64) -> Result<String, Error> {
-        Ok(
-            serde_json::to_string(&self.to_model_db_entry(timestamp, deck_id)?)
-                .map_err(json_error)?,
-        )
+    pub(super) fn to_json(&mut self, timestamp: f64, deck_id: i64) -> Result<String> {
+        Ok(serde_json::to_string(
+            &self.to_model_db_entry(timestamp, deck_id)?,
+        )?)
     }
 }
 
@@ -247,9 +245,9 @@ fn contains_other_fields(rendered: &str, current_field: &str, sentinel: &str) ->
         field = current_field,
         sentinel = sentinel
     ))
-    .unwrap()
-    .is_match(rendered)
-    .unwrap()
+        .unwrap()
+        .is_match(rendered)
+        .unwrap()
 }
 
 #[cfg(test)]
@@ -276,7 +274,7 @@ mod tests {
  color: lightblue;
 }
 "#
-        .to_owned()
+            .to_owned()
     }
 
     fn cloze_model() -> Model {

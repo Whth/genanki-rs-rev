@@ -1,10 +1,9 @@
 use super::Package;
-use crate::Error;
 use crate::db_entries::{DeckDbEntry, ModelDbEntry};
-use crate::error::{database_error, json_error};
+use crate::error::Result;
 use crate::model::Model;
 use crate::note::Note;
-use rusqlite::{Transaction, params};
+use rusqlite::{params, Transaction};
 use std::collections::HashMap;
 use std::ops::RangeFrom;
 
@@ -80,37 +79,29 @@ impl Deck {
         transaction: &Transaction,
         timestamp: f64,
         id_gen: &mut RangeFrom<usize>,
-    ) -> Result<(), Error> {
-        let decks_json_str: String = transaction
-            .query_row("SELECT decks FROM col", [], |row| row.get(0))
-            .map_err(database_error)?;
-        let mut decks: HashMap<i64, DeckDbEntry> =
-            serde_json::from_str(&decks_json_str).map_err(json_error)?;
+    ) -> Result<()> {
+        let decks_json_str: String =
+            transaction.query_row("SELECT decks FROM col", [], |row| row.get(0))?;
+        let mut decks: HashMap<i64, DeckDbEntry> = serde_json::from_str(&decks_json_str)?;
         decks.insert(self.id, self.to_deck_db_entry());
-        transaction
-            .execute(
-                "UPDATE col SET decks = ?",
-                params![serde_json::to_string(&decks).map_err(json_error)?],
-            )
-            .map_err(database_error)?;
+        transaction.execute(
+            "UPDATE col SET decks = ?",
+            params![serde_json::to_string(&decks)?],
+        )?;
 
-        let models_json_str: String = transaction
-            .query_row("SELECT models FROM col", [], |row| row.get(0))
-            .map_err(database_error)?;
-        let mut models: HashMap<i64, ModelDbEntry> =
-            serde_json::from_str(&models_json_str).map_err(json_error)?;
+        let models_json_str: String =
+            transaction.query_row("SELECT models FROM col", [], |row| row.get(0))?;
+        let mut models: HashMap<i64, ModelDbEntry> = serde_json::from_str(&models_json_str)?;
         for note in self.notes.clone().iter() {
             self.add_model(note.model());
         }
         for (i, model) in &mut self.models {
             models.insert(*i, model.to_model_db_entry(timestamp, self.id)?);
         }
-        transaction
-            .execute(
-                "UPDATE col SET models = ?",
-                [serde_json::to_string(&models).map_err(json_error)?],
-            )
-            .map_err(database_error)?;
+        transaction.execute(
+            "UPDATE col SET models = ?",
+            [serde_json::to_string(&models)?],
+        )?;
         for note in &mut self.notes {
             note.write_to_db(&transaction, timestamp, self.id, id_gen)?;
         }
@@ -140,8 +131,7 @@ impl Deck {
     ///
     /// Package::new(vec![my_deck], vec![])?.write_to_file("output.apkg")?;
     /// ```
-    pub fn write_to_file(&self, file: &str) -> Result<(), Error> {
-        Package::new(vec![self.clone()], vec![])?.write_to_file(file)?;
-        Ok(())
+    pub fn write_to_file(&self, file: &str) -> Result<()> {
+        Package::new(vec![self.clone()], vec![]).write_to_file(file)
     }
 }

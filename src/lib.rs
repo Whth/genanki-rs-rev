@@ -11,7 +11,7 @@
 //! ```rust
 //! use genanki_rs::{basic_model, Deck, Error, Note};
 //!
-//! fn main() -> Result<(), Error> {
+//! fn main() -> Result<()> {
 //!     let mut deck = Deck::new(1234, "Example Deck", "Example Deck containing 2 Flashcards");
 //!     deck.add_note(Note::new(basic_model(), vec!["What is the capital of France?", "Paris"])?);
 //!     deck.add_note(Note::new(basic_model(), vec!["What is the capital of Germany?", "Berlin"])?);
@@ -30,7 +30,7 @@
 //! ```rust,ignore
 //! use genanki_rs::{Note, Error};
 //!
-//! fn main() -> Result<(), Error> {
+//! fn main() -> Result<()> {
 //!     // let my_model = ...
 //!     let my_note = Note::new(my_model, vec!["Capital of Argentina", "Buenos Aires"])?;
 //!     Ok(())
@@ -45,7 +45,7 @@
 //! ```rust
 //! use genanki_rs::{Field, Model, Template, Error};
 //!
-//! fn main() -> Result<(), Error> {
+//! fn main() -> Result<()> {
 //!     let my_model = Model::new(
 //!         1607392319,
 //!         "Simple Model",
@@ -88,7 +88,7 @@
 //! # use genanki_rs::Note;
 //! # fn make_note() -> Note { todo!() }
 //!
-//! fn main() -> Result<(), Error> {
+//! fn main() -> Result<()> {
 //!     let my_note = make_note();
 //!     let mut my_deck = Deck::new(
 //!         2059400110,
@@ -116,7 +116,7 @@
 //! ```rust,ignore
 //! use genanki_rs::{Deck, Error, Package};
 //!
-//! fn main() -> Result<(), Error> {
+//! fn main() -> Result<()> {
 //!     // ...
 //!     // my_deck.add(my_note)
 //!     let mut my_package = Package::new(vec![my_deck], vec!["sound.mp3", "images/image.jpg"])?;
@@ -147,7 +147,7 @@
 //!
 //! ```rust
 //! # use genanki_rs::{Field, Template, Model, Error, Note};
-//! # fn main() -> Result<(), Error> {
+//! # fn main() -> Result<()> {
 //! # let my_model = Model::new(
 //! #    1607392319,
 //! #    "Simple Model",
@@ -183,8 +183,6 @@
 //! the Note, `1` means the second, etc.
 //!
 
-mod apkg_col;
-mod apkg_schema;
 mod builders;
 mod builtin_models;
 mod card;
@@ -199,7 +197,7 @@ mod util;
 pub use builders::{Field, Template};
 pub use builtin_models::*;
 pub use deck::Deck;
-pub use error::Error;
+pub use error::{Error, Result};
 pub use model::{Model, ModelType};
 pub use note::Note;
 pub use package::Package;
@@ -357,8 +355,8 @@ mod tests {
                 c_str!("test_cleanup"),
                 c_str!("test_cleanup.py"),
             )
-            .unwrap()
-            .to_owned();
+                .unwrap()
+                .to_owned();
             cleanup
                 .call_method1(
                     "cleanup",
@@ -439,8 +437,8 @@ res = col
                 c_str!("check_media"),
                 c_str!("check_media.py"),
             )
-            .unwrap()
-            .to_owned();
+                .unwrap()
+                .to_owned();
             check
                 .call_method1("check_media", (self.col(),))
                 .unwrap()
@@ -466,7 +464,7 @@ res = col
             let mut setup = TestSetup::new(&py);
             let mut deck = Deck::new(123456, "foodeck", "");
             deck.add_note(Note::new(model(), vec!["a", "b"]).unwrap());
-            setup.import_package(Package::new(vec![deck], vec![]).unwrap(), None);
+            setup.import_package(Package::new(vec![deck], vec![]), None);
             assert!(
                 setup.check_col("len(col.decks.all()) == 2 and {i['name'] for i in col.decks.all()} ==  {'Default', 'foodeck'}")
             );
@@ -482,7 +480,7 @@ res = col
             deck.add_note(Note::new(cn_model(), vec!["a", "b", "c"]).unwrap());
             deck.add_note(Note::new(cn_model(), vec!["d", "e", "f"]).unwrap());
             deck.add_note(Note::new(cn_model(), vec!["g", "h", "i"]).unwrap());
-            setup.import_package(Package::new(vec![deck], vec![]).unwrap(), None);
+            setup.import_package(Package::new(vec![deck], vec![]), None);
             assert!(setup.check_col("len([col.getCard(i) for i in col.find_cards('')]) == 6"));
         });
     }
@@ -497,7 +495,7 @@ res = col
             let note = Note::new(model(), vec!["a", "b"]).unwrap();
             deck1.add_note(note.clone());
             deck2.add_note(note);
-            setup.import_package(Package::new(vec![deck1, deck2], vec![]).unwrap(), None);
+            setup.import_package(Package::new(vec![deck1, deck2], vec![]), None);
             assert!(setup.check_col("len(col.decks.all()) == 3"));
         });
     }
@@ -545,12 +543,12 @@ res = col
             model_with_hint(),
             vec!["capital of California", "", "Sacramento"],
         )
-        .unwrap();
+            .unwrap();
         let note2 = Note::new(
             model_with_hint(),
             vec!["capital of Iowa", "French for \"The Moines\"", "Des Moines"],
         )
-        .unwrap();
+            .unwrap();
 
         assert_eq!(note1.cards().len(), 1);
         assert_eq!(note1.cards()[0].ord(), 0);
@@ -572,7 +570,7 @@ res = col
                 r#"answer <img src="present.jpg"> <img src="missing.jpg">"#,
             ],
         )
-        .unwrap();
+            .unwrap();
         deck.add_note(note);
         std::fs::File::create("present.mp3")
             .unwrap()
@@ -585,7 +583,7 @@ res = col
         Python::attach(|py| {
             let mut setup = TestSetup::new(&py);
             setup.import_package(
-                Package::new(vec![deck], vec!["present.mp3", "present.jpg"]).unwrap(),
+                Package::new(vec![deck], vec!["present.mp3", "present.jpg"]),
                 None,
             );
 
@@ -613,7 +611,7 @@ res = col
                 r#"answer <img src="present.jpg"> <img src="missing.jpg">"#,
             ],
         )
-        .unwrap();
+            .unwrap();
         deck.add_note(note);
         let present_mp3_path = tmp_dir.path().join("present.mp3");
         let present_jpg_path = tmp_dir.path().join("present.jpg");
@@ -635,7 +633,7 @@ res = col
                         present_jpg_path.to_str().unwrap(),
                     ],
                 )
-                .unwrap(),
+                ,
                 None,
             );
             let (missing, _, _) = setup.check_media();
@@ -653,7 +651,7 @@ res = col
             let mut deck = Deck::new(112233, "foodeck", "Very nice deck");
             let note = Note::new(model(), vec!["a", "b"]).unwrap();
             deck.add_note(note);
-            setup.import_package(Package::new(vec![deck], vec![]).unwrap(), None);
+            setup.import_package(Package::new(vec![deck], vec![]), None);
             assert!(setup
                 .check_col("len(col.decks.all()) == 2 and 'Very nice deck' in [e['desc'] for e in col.decks.all()[:2]]"))
         });
@@ -667,7 +665,7 @@ res = col
             let mut deck = Deck::new(1104693946, "foodeck", "");
             let note = Note::new(model(), vec!["a", "b"]).unwrap();
             deck.add_note(note);
-            setup.import_package(Package::new(vec![deck], vec![]).unwrap(), None);
+            setup.import_package(Package::new(vec![deck], vec![]), None);
             assert!(
                 setup.check_col("col.getNote(col.find_notes('')[0]).cards()[0].id > 1577836800000")
             )
@@ -682,7 +680,7 @@ res = col
             let mut deck = Deck::new(69696969696, "foodeck", "");
             let note = Note::new(model_with_latex(), vec!["a", "b"]).unwrap();
             deck.add_note(note);
-            setup.import_package(Package::new(vec![deck], vec![]).unwrap(), None);
+            setup.import_package(Package::new(vec![deck], vec![]), None);
             let col = setup.col();
             let code = c_str!(
                 r#"
@@ -704,7 +702,7 @@ def latex(col, key):
             );
             assert_eq!(
                 assertion
-                    .call_method("latex", (col, PyString::new(py, "latexPost"),), None,)
+                    .call_method("latex", (col, PyString::new(py, "latexPost"),), None, )
                     .unwrap()
                     .extract::<String>()
                     .unwrap(),
@@ -721,7 +719,7 @@ def latex(col, key):
             let mut deck = Deck::new(1104693946, "foodeck", "");
             let note = Note::new(model_with_sort_field_index(), vec!["a", "b"]).unwrap();
             deck.add_note(note);
-            setup.import_package(Package::new(vec![deck], vec![]).unwrap(), None);
+            setup.import_package(Package::new(vec![deck], vec![]), None);
             assert!(setup.check_col(&format!(
                 "col.getNote(col.find_notes('')[0]).model()['sortf'] == {}",
                 CUSTOM_SORT_FIELD_INDEX
