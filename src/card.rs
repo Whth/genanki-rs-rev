@@ -13,7 +13,6 @@ impl Card {
     pub fn new(ord: i64, suspend: bool) -> Self {
         Self { ord, suspend }
     }
-    #[allow(dead_code)]
     pub fn ord(&self) -> i64 {
         self.ord
     }
