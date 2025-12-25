@@ -17,19 +17,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: ['3.11', '3.12', '3.13']
+        os: [ ubuntu-latest, windows-latest ]
+        python-version: [ '3.11', '3.12', '3.13' ]
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install nightly rust
         run: rustup default nightly
 
       - name: Cache cargo registry
         id: cache-registry
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
