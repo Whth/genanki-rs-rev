@@ -211,7 +211,7 @@ mod tests {
     use pyo3::prelude::*;
     use pyo3::types::{PyDict, PyString};
     use serial_test::serial;
-    use std::ffi::{ CString};
+    use std::ffi::CString;
     use std::io::Write;
     use std::str::FromStr;
     use tempfile::{NamedTempFile, TempDir, TempPath};
@@ -334,7 +334,9 @@ mod tests {
         let setup = PyModule::from_code(*py, code, c_str!("test_setup"), c_str!("test_setup.py"))
             .unwrap()
             .to_owned();
-        let col = setup.call_method1("setup",(PyString::new(*py, col_fname),)).unwrap();
+        let col = setup
+            .call_method1("setup", (PyString::new(*py, col_fname),))
+            .unwrap();
         col
     }
 
@@ -426,8 +428,7 @@ res = col
         fn check_col(&mut self, condition_str: &str) -> bool {
             let binding = CString::from_str(condition_str).unwrap();
             let code = binding.as_c_str();
-            Python::attach(|py| py.eval(code, None, None).unwrap().extract::<bool>())
-                .unwrap()
+            Python::attach(|py| py.eval(code, None, None).unwrap().extract::<bool>()).unwrap()
         }
 
         fn check_media(&self) -> (Vec<String>, Vec<String>, Vec<String>) {

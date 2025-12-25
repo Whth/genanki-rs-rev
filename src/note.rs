@@ -169,17 +169,17 @@ impl Note {
             .execute(
                 "INSERT INTO notes VALUES(?,?,?,?,?,?,?,?,?,?,?);",
                 params![
-                    id_gen.next().expect("Range overflowed!") as i64,        // id
-                    self.get_guid(),      // guid
-                    self.model.id,        // mid
-                    timestamp as i64,     // mod
-                    -1,                   // usn
-                    self.format_tags(),   // TODO tags
-                    self.format_fields(), // flds
-                    self.sort_field,      // sfld
-                    0,                    // csum, can be ignored
-                    0,                    // flags
-                    "",                   // data
+                    id_gen.next().expect("Range overflowed!") as i64, // id
+                    self.get_guid(),                                  // guid
+                    self.model.id,                                    // mid
+                    timestamp as i64,                                 // mod
+                    -1,                                               // usn
+                    self.format_tags(),                               // TODO tags
+                    self.format_fields(),                             // flds
+                    self.sort_field,                                  // sfld
+                    0,                                                // csum, can be ignored
+                    0,                                                // flags
+                    "",                                               // data
                 ],
             )
             .map_err(database_error)?;

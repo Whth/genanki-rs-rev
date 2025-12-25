@@ -30,24 +30,24 @@ impl Card {
             .execute(
                 "INSERT INTO cards VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
                 params![
-                    id_gen.next().expect("Range overflowed!") as i64,    // id
-                    note_id as i64,          // nid
-                    deck_id,          // did
-                    self.ord,         // ord
-                    timestamp as i64, // mod
-                    -1,               // usn
-                    0,                // type (=0 for non-Cloze)
-                    queue,            // queue
-                    0,                // due
-                    0,                // ivl
-                    0,                // factor
-                    0,                // reps
-                    0,                // lapses
-                    0,                // left
-                    0,                // odue
-                    0,                // odid
-                    0,                // flags
-                    "",               // data
+                    id_gen.next().expect("Range overflowed!") as i64, // id
+                    note_id as i64,                                   // nid
+                    deck_id,                                          // did
+                    self.ord,                                         // ord
+                    timestamp as i64,                                 // mod
+                    -1,                                               // usn
+                    0,                                                // type (=0 for non-Cloze)
+                    queue,                                            // queue
+                    0,                                                // due
+                    0,                                                // ivl
+                    0,                                                // factor
+                    0,                                                // reps
+                    0,                                                // lapses
+                    0,                                                // left
+                    0,                                                // odue
+                    0,                                                // odid
+                    0,                                                // flags
+                    "",                                               // data
                 ],
             )
             .map_err(database_error)?;
