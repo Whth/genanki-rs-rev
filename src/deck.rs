@@ -3,7 +3,7 @@ use crate::db_entries::{DeckDbEntry, ModelDbEntry};
 use crate::error::Result;
 use crate::model::Model;
 use crate::note::Note;
-use rusqlite::{params, Transaction};
+use rusqlite::{Transaction, params};
 use std::collections::HashMap;
 use std::ops::RangeFrom;
 
@@ -36,7 +36,7 @@ impl Deck {
     /// Example:
     ///
     /// ```rust
-    /// use genanki_rs::{Deck, Note, basic_model};
+    /// use genanki_rs_rev::{Deck, Note, basic_model};
     ///
     /// let mut my_deck = Deck::new(1234, "Example deck", "This is an example deck");
     /// my_deck.add_note(Note::new(basic_model(), vec!["What is the capital of France?", "Paris"])?);
@@ -67,7 +67,6 @@ impl Deck {
             usn: -1,
         }
     }
-
 
     pub(super) fn write_to_db(
         &mut self,
@@ -109,7 +108,7 @@ impl Deck {
     ///
     /// Example:
     /// ```rust
-    /// use genanki_rs::{Deck, Note, basic_model};
+    /// use genanki_rs_rev::{Deck, Note, basic_model};
     ///
     /// let mut my_deck = Deck::new(1234, "Example deck", "This is an example deck");
     /// my_deck.add_note(Note::new(basic_model(), vec!["What is the capital of France?", "Paris"])?);
@@ -119,7 +118,7 @@ impl Deck {
     ///
     /// This is equivalent to:
     /// ```rust
-    /// use genanki_rs::{Deck, Note, basic_model, Package};
+    /// use genanki_rs_rev::{Deck, Note, basic_model, Package};
     ///
     /// let mut my_deck = Deck::new(1234, "Example deck", "This is an example deck");
     /// my_deck.add_note(Note::new(basic_model(), vec!["What is the capital of France?", "Paris"])?);

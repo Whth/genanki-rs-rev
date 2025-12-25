@@ -27,7 +27,7 @@ impl Note {
     ///
     /// Example:
     /// ```
-    /// use genanki_rs::{Note, basic_model};
+    /// use genanki_rs_rev::{Note, basic_model};
     ///
     /// let note = Note::new(basic_model(), vec!["What is the capital of France?", "Paris"]);
     /// ```

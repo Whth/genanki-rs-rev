@@ -17,7 +17,7 @@ use crate::deck::Deck;
 ///
 /// Example:
 /// ```rust
-/// use genanki_rs::{Package, Deck, Note, Model, Field, Template};
+/// use genanki_rs_rev::{Package, Deck, Note, Model, Field, Template};
 ///
 /// let model = Model::new(
 ///     1607392319,

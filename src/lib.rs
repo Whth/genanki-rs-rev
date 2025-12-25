@@ -1,4 +1,4 @@
-#[doc = include_str!("../README.md")]
+#![doc = include_str!("../README.md")]
 mod builders;
 mod builtin_models;
 mod card;

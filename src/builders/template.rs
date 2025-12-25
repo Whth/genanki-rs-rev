@@ -6,7 +6,7 @@ use crate::db_entries::Tmpl;
 ///
 /// Example:
 /// ```rust
-/// use genanki_rs::Template;
+/// use genanki_rs_rev::Template;
 ///
 /// let template1 = Template::new("Card 1").qfmt("{{Question}}").afmt(r#"{{FrontSide}}<hr id="answer">{{Answer}}"#);
 /// let template2 = Template::new("Card 2").qfmt("{{Back}}").afmt("{{FrontSide}}\n\n<hr id=answer>\n\n{{Front}}");

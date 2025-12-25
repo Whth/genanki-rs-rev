@@ -46,7 +46,7 @@ impl Model {
     /// Example:
     ///
     /// ```
-    /// use genanki_rs::{Model, Field, Template};
+    /// use genanki_rs_rev::{Model, Field, Template};
     /// let model = Model::new(
     ///     1607392319,
     ///     "Simple Model",
@@ -237,7 +237,7 @@ fn contains_other_fields(rendered: &str, current_field: &str, sentinel: &str) ->
         field = current_field,
         sentinel = sentinel
     ))
-        .unwrap()
-        .is_match(rendered)
-        .unwrap()
+    .unwrap()
+    .is_match(rendered)
+    .unwrap()
 }

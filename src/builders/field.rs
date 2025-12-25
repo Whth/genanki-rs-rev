@@ -7,7 +7,7 @@ use crate::db_entries::Fld;
 /// Example:
 ///
 /// ```rust
-/// use genanki_rs::Field;
+/// use genanki_rs_rev::Field;
 ///
 /// let field1 = Field::new("field1");
 /// let field2 = Field::new("field2").font("Comic Sans").size(15);

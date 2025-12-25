@@ -4,13 +4,13 @@ use crate::model::ModelType;
 /// Returns a basic Front/Back `Model`.
 ///
 /// ```rust
-/// use genanki_rs::basic_model;
+/// use genanki_rs_rev::basic_model;
 /// let my_model = basic_model();
 /// ```
 ///
 /// is equivalent to
 /// ```rust
-/// use genanki_rs::{Model, Field, Template};
+/// use genanki_rs_rev::{Model, Field, Template};
 /// let my_model = Model::new_with_options(
 ///         1559383000,
 ///         "Basic (genanki)",
@@ -56,13 +56,13 @@ pub fn basic_model() -> Model {
 /// Returns a basic Front/Back, Back/Front `Model`.
 ///
 /// ```rust
-/// use genanki_rs::basic_and_reversed_card_model;
+/// use genanki_rs_rev::basic_and_reversed_card_model;
 /// let my_model = basic_and_reversed_card_model();
 /// ```
 ///
 /// is equivalent to
 /// ```rust
-/// use genanki_rs::{Model, Field, Template};
+/// use genanki_rs_rev::{Model, Field, Template};
 /// let my_model = Model::new_with_options(
 ///         1485830179,
 ///         "Basic (and reversed card) (genanki)",
@@ -116,13 +116,13 @@ pub fn basic_and_reversed_card_model() -> Model {
 /// Returns a basic Front/Back, Optional Back/Front `Model`.
 ///
 /// ```rust
-/// use genanki_rs::basic_optional_reversed_card_model;
+/// use genanki_rs_rev::basic_optional_reversed_card_model;
 /// let my_model = basic_optional_reversed_card_model();
 /// ```
 ///
 /// is equivalent to
 /// ```rust
-/// use genanki_rs::{Model, Field, Template};
+/// use genanki_rs_rev::{Model, Field, Template};
 /// let my_model = Model::new_with_options(
 ///         1382232460,
 ///         "Basic (optional reversed card) (genanki)",
@@ -178,13 +178,13 @@ pub fn basic_optional_reversed_card_model() -> Model {
 /// Returns a basic `Model` for cards where you can type in the answer.
 ///
 /// ```rust
-/// use genanki_rs::basic_type_in_the_answer_model;
+/// use genanki_rs_rev::basic_type_in_the_answer_model;
 /// let my_model = basic_type_in_the_answer_model();
 /// ```
 ///
 /// is equivalent to
 /// ```rust
-/// use genanki_rs::{Model, Field, Template};
+/// use genanki_rs_rev::{Model, Field, Template};
 /// let my_model = Model::new_with_options(
 ///         1305534440,
 ///         "Basic (type in the answer) (genanki)",
@@ -232,13 +232,13 @@ pub fn basic_type_in_the_answer_model() -> Model {
 /// Returns a basic `Model` for cards with clozes.
 ///
 /// ```rust
-/// use genanki_rs::cloze_model;
+/// use genanki_rs_rev::cloze_model;
 /// let my_model = cloze_model();
 /// ```
 ///
 /// is equivalent to
 /// ```rust
-/// use genanki_rs::{Model, Field, Template, ModelType};
+/// use genanki_rs_rev::{Model, Field, Template, ModelType};
 /// let my_model = Model::new_with_options(
 ///         1122529321,
 ///         "Cloze (genanki)",

@@ -1,4 +1,4 @@
-use genanki_rs_rev::{Deck, Error, Field, Model, ModelType, Note, Package, Template};
+use genanki_rs_rev::{Deck, Field, Model, Note, Package, Template};
 use pyo3::ffi::c_str;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyString};
