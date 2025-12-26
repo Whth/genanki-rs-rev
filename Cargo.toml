@@ -1,6 +1,6 @@
 [package]
 name = "genanki-rs-rev"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2024"
 license-file = "LICENSE"
 description = "Crate to create decks for the open source flashcard platform Anki. Based on Python library genanki"
@@ -22,7 +22,7 @@ hex = "0.4.3"
 
 [dev-dependencies]
 anyhow = "1.0.100"
-pyo3 = { version = "0.27.2", features = ["auto-initialize", "extension-module"] }
+pyo3 = { version = "0.27.2", features = ["auto-initialize"] }
 serial_test = "3.2.0"
 uuid = { version = "1.19", features = ["v4"] }
 
