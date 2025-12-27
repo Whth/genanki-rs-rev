@@ -1,0 +1,19 @@
+[package]
+name = "genanki-export"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "APKG export functionality for genanki-rs"
+
+[dependencies]
+rusqlite = { workspace = true }
+zip = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+genanki-core = { path = "../genanki-core", features = ["export"] }
+genanki-storage = { path = "../genanki-storage" }
+
+[dev-dependencies]
+anyhow = { workspace = true }

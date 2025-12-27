@@ -1,0 +1,34 @@
+[package]
+name = "genanki-rs-rev"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Crate to create decks for the open source flashcard platform Anki. Based on Python library genanki"
+
+[dependencies]
+# Re-export all sub-crates
+genanki-core = { path = "../genanki-core", features = ["database", "export"] }
+genanki-storage = { path = "../genanki-storage" }
+genanki-macros = { path = "../genanki-macros" }
+genanki-builder = { path = "../genanki-builder" }
+genanki-export = { path = "../genanki-export" }
+
+# Direct dependencies for backward compatibility
+rusqlite = { workspace = true }
+tempfile = { workspace = true }
+zip = { workspace = true }
+serde_json = { workspace = true }
+fancy-regex = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+ramhorns = { workspace = true }
+thiserror = { workspace = true }
+blake3 = { workspace = true }
+hex = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+pyo3 = { workspace = true }
+serial_test = { workspace = true }
+uuid = { workspace = true }
