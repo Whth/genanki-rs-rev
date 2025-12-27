@@ -50,7 +50,10 @@ impl Note {
 
         // Validate field count
         if model.num_fields() != fields.len() {
-            return Err(Error::ModelFieldCountMismatch(model.num_fields(), fields.len()));
+            return Err(Error::ModelFieldCountMismatch(
+                model.num_fields(),
+                fields.len(),
+            ));
         }
 
         let cards = match model.model_type {
@@ -92,7 +95,10 @@ impl Note {
 
         // Validate field count
         if model.num_fields() != fields.len() {
-            return Err(Error::ModelFieldCountMismatch(model.num_fields(), fields.len()));
+            return Err(Error::ModelFieldCountMismatch(
+                model.num_fields(),
+                fields.len(),
+            ));
         }
 
         let cards = match model.model_type {
@@ -196,9 +202,18 @@ fn generate_basic_cards(model: &Model, fields: &[String]) -> Result<Vec<Card>> {
 
     for (card_ord, any_or_all, required_field_ords) in model.req()?.iter() {
         let should_create = match any_or_all.as_str() {
-            "any" => required_field_ords.iter().any(|&ord| !fields[ord].is_empty()),
-            "all" => required_field_ords.iter().all(|&ord| !fields[ord].is_empty()),
-            _ => return Err(Error::Validation(format!("Invalid req type: {}", any_or_all))),
+            "any" => required_field_ords
+                .iter()
+                .any(|&ord| !fields[ord].is_empty()),
+            "all" => required_field_ords
+                .iter()
+                .all(|&ord| !fields[ord].is_empty()),
+            _ => {
+                return Err(Error::Validation(format!(
+                    "Invalid req type: {}",
+                    any_or_all
+                )));
+            }
         };
 
         if should_create {
@@ -219,10 +234,7 @@ fn generate_cloze_cards(model: &Model, fields: &[String]) -> Vec<Card> {
         r"{{[^}]*?cloze:(?:[^}]?:)*(.+?)}}",
         &model.templates[0].qfmt,
     ));
-    cloze_replacements.extend(re_findall(
-        "<%cloze:(.+?)%>",
-        &model.templates[0].qfmt,
-    ));
+    cloze_replacements.extend(re_findall("<%cloze:(.+?)%>", &model.templates[0].qfmt));
 
     let empty_string = String::new();
     for field_name in cloze_replacements {
@@ -247,10 +259,7 @@ fn generate_cloze_cards(model: &Model, fields: &[String]) -> Vec<Card> {
         card_ords.insert(0);
     }
 
-    card_ords
-        .iter()
-        .map(|&ord| Card::new(ord, false))
-        .collect()
+    card_ords.iter().map(|&ord| Card::new(ord, false)).collect()
 }
 
 /// Find all regex matches in a string
@@ -291,6 +300,7 @@ fn find_invalid_html_tags(field: &str) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{Field, Template};
 
     #[test]
     fn test_note_new() {
@@ -335,7 +345,8 @@ mod tests {
             None,
             Some(vec!["tag1", "tag2"]),
             None,
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(note.tags(), &["tag1", "tag2"]);
     }

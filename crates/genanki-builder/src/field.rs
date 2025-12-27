@@ -81,10 +81,7 @@ mod tests {
 
     #[test]
     fn test_field_builder() {
-        let field = FieldBuilder::new("Test")
-            .font("Arial")
-            .size(30)
-            .build();
+        let field = FieldBuilder::new("Test").font("Arial").size(30).build();
 
         assert_eq!(field.name, "Test");
         assert_eq!(field.font, Some("Arial".to_string()));

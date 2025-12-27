@@ -77,10 +77,7 @@ mod tests {
 
     #[test]
     fn test_guid_for() {
-        let fields = vec![
-            "Question".to_string(),
-            "Answer".to_string(),
-        ];
+        let fields = vec!["Question".to_string(), "Answer".to_string()];
         let guid = guid_for(&fields);
         assert_eq!(guid.len(), 64);
         assert!(is_valid_guid(&guid));
@@ -88,10 +85,7 @@ mod tests {
 
     #[test]
     fn test_guid_for_short() {
-        let fields = vec![
-            "Question".to_string(),
-            "Answer".to_string(),
-        ];
+        let fields = vec!["Question".to_string(), "Answer".to_string()];
         let guid = guid_for_short(&fields);
         assert_eq!(guid.len(), 32);
         assert!(is_valid_guid(&guid));
@@ -99,10 +93,7 @@ mod tests {
 
     #[test]
     fn test_guid_deterministic() {
-        let fields = vec![
-            "Test".to_string(),
-            "Fields".to_string(),
-        ];
+        let fields = vec!["Test".to_string(), "Fields".to_string()];
         let guid1 = guid_for(&fields);
         let guid2 = guid_for(&fields);
         assert_eq!(guid1, guid2);
@@ -117,7 +108,9 @@ mod tests {
 
     #[test]
     fn test_is_valid_guid() {
-        assert!(is_valid_guid(&"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"));
+        assert!(is_valid_guid(
+            &"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+        ));
         assert!(is_valid_guid(&"0123456789abcdef0123456789abcdef"));
         assert!(!is_valid_guid(&"invalid"));
         assert!(!is_valid_guid(&"0123456789abcdef"));

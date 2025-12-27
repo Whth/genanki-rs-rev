@@ -19,17 +19,17 @@ pub fn write_note_to_db(
     transaction.execute(
         "INSERT INTO notes VALUES(?,?,?,?,?,?,?,?,?,?,?);",
         params![
-            note_id,                          // id
-            note.guid(),                      // guid
-            note.model().id,                  // mid
-            timestamp as i64,                 // mod
-            -1_i64,                           // usn
-            note.format_tags(),               // tags
-            note.format_fields(),             // flds
-            false,                            // sfld
-            0_i64,                            // csum
-            0_i64,                            // flags
-            "",                               // data
+            note_id,              // id
+            note.guid(),          // guid
+            note.model().id,      // mid
+            timestamp as i64,     // mod
+            -1_i64,               // usn
+            note.format_tags(),   // tags
+            note.format_fields(), // flds
+            false,                // sfld
+            0_i64,                // csum
+            0_i64,                // flags
+            "",                   // data
         ],
     )?;
 

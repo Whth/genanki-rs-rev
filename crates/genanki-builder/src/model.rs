@@ -1,6 +1,6 @@
 //! Model builder
 
-use genanki_core::{Model, ModelType, Field, Template};
+use genanki_core::{Field, Model, ModelType, Template};
 
 /// Builder for models
 pub struct ModelBuilder {
@@ -81,10 +81,14 @@ impl BasicModels {
                 Field::new("Front").font("Arial"),
                 Field::new("Back").font("Arial"),
             ],
-            vec![Template::new("Card 1")
-                .qfmt("{{Front}}")
-                .afmt("{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}")],
-            Some(".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n"),
+            vec![
+                Template::new("Card 1")
+                    .qfmt("{{Front}}")
+                    .afmt("{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}"),
+            ],
+            Some(
+                ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n",
+            ),
             None,
             None,
             None,
@@ -97,10 +101,14 @@ impl BasicModels {
             1122529321,
             "Cloze (genanki)",
             vec![Field::new("Text").font("Arial")],
-            vec![Template::new("Cloze")
-                .qfmt("{{cloze:Text}}")
-                .afmt("{{cloze:Text}}")],
-            Some(".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n\n .cloze {\n font-weight: bold;\n color: blue;\n}\n.nightMode .cloze {\n color: lightblue;\n}"),
+            vec![
+                Template::new("Cloze")
+                    .qfmt("{{cloze:Text}}")
+                    .afmt("{{cloze:Text}}"),
+            ],
+            Some(
+                ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n\n .cloze {\n font-weight: bold;\n color: blue;\n}\n.nightMode .cloze {\n color: lightblue;\n}",
+            ),
             Some(ModelType::Cloze),
             None,
             None,

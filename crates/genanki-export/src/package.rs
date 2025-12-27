@@ -1,7 +1,7 @@
 //! Package creation and export
 
 use genanki_core::Deck;
-use genanki_storage::{CollectionManager, models, decks, notes, cards};
+use genanki_storage::{CollectionManager, cards, decks, models, notes};
 use std::collections::HashMap;
 use std::ops::RangeFrom;
 use std::path::Path;
@@ -57,10 +57,7 @@ impl Package {
         if decks.is_empty() {
             return Err(PackageError::NoDecks);
         }
-        Ok(Self {
-            decks,
-            media_files,
-        })
+        Ok(Self { decks, media_files })
     }
 
     /// Write to a file
@@ -72,7 +69,8 @@ impl Package {
         let mut id_gen = 0..;
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
-            .as_secs_f64() * 1000.0;
+            .as_secs_f64()
+            * 1000.0;
 
         for deck in &self.decks {
             self.write_deck_to_db(deck, collection.connection_mut(), timestamp, &mut id_gen)?;

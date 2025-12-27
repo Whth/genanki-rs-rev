@@ -2,15 +2,15 @@
 //!
 //! This crate provides enhanced builder patterns and DSL for creating Anki components.
 
+pub mod deck;
 pub mod field;
-pub mod template;
 pub mod model;
 pub mod note;
-pub mod deck;
+pub mod template;
 
 // Re-exports
-pub use field::{FieldBuilder, FieldDefaultsConstants};
-pub use template::{TemplateBuilder, TemplateDefaults};
-pub use model::{ModelBuilder, BasicModels};
-pub use note::NoteBuilder;
 pub use deck::DeckBuilder;
+pub use field::{FieldBuilder, FieldDefaultsConstants};
+pub use model::{BasicModels, ModelBuilder};
+pub use note::NoteBuilder;
+pub use template::{TemplateBuilder, TemplateDefaults};

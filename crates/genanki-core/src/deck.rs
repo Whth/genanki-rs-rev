@@ -121,6 +121,7 @@ impl Deck {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{Field, Template};
 
     #[test]
     fn test_deck_new() {

@@ -1,6 +1,6 @@
 //! Model database operations
 
-use crate::schema::{ModelDbEntry, FieldDbEntry, TemplateDbEntry};
+use crate::schema::{FieldDbEntry, ModelDbEntry, TemplateDbEntry};
 use genanki_core::{Model, ModelType};
 
 /// Convert a core Model to a database entry
@@ -27,7 +27,10 @@ pub fn model_to_db_entry(model: &mut Model, timestamp: f64, deck_id: i64) -> Mod
                 sticky: f.sticky.unwrap_or(false),
                 rtl: f.rtl.unwrap_or(false),
                 ord: i as i64,
-                font: f.font.clone().unwrap_or_else(|| "Liberation Sans".to_string()),
+                font: f
+                    .font
+                    .clone()
+                    .unwrap_or_else(|| "Liberation Sans".to_string()),
                 size: f.size.unwrap_or(20),
             })
             .collect(),

@@ -27,7 +27,9 @@ pub enum Error {
     Json(Box<dyn std::error::Error + Send + Sync>),
 
     /// Template formatting errors
-    #[error("Could not compute required fields for this template; please check the formatting: {0:?}")]
+    #[error(
+        "Could not compute required fields for this template; please check the formatting: {0:?}"
+    )]
     TemplateFormat(String),
 
     /// Model field count mismatch

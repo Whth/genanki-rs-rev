@@ -1,7 +1,7 @@
 //! Note builder
 
-use genanki_core::{Note, Model};
 use anyhow::Result;
+use genanki_core::{Model, Note};
 
 /// Builder for notes
 pub struct NoteBuilder {
@@ -59,7 +59,9 @@ impl NoteBuilder {
     }
 
     pub fn build(self) -> Result<Note> {
-        let model = self.model.ok_or_else(|| anyhow::anyhow!("Model is required"))?;
+        let model = self
+            .model
+            .ok_or_else(|| anyhow::anyhow!("Model is required"))?;
 
         if self.fields.is_empty() {
             return Err(anyhow::anyhow!("Fields are required"));

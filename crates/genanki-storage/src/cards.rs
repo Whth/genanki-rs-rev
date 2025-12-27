@@ -18,7 +18,7 @@ pub fn write_card_to_db(
         "INSERT INTO cards VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
         params![
             id_gen.next().expect("Range overflowed!") as i64, // id
-            note_id,                                           // nid
+            note_id,                                          // nid
             deck_id,                                          // did
             card.ord(),                                       // ord
             timestamp as i64,                                 // mod

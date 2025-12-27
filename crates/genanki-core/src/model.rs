@@ -2,7 +2,7 @@
 //!
 //! A model defines the structure of notes, including fields and templates.
 
-use crate::config::{ModelConfig};
+use crate::config::ModelConfig;
 use crate::error::{Error, Result};
 use fancy_regex::Regex;
 use ramhorns::Template as RamTemplate;
@@ -272,7 +272,11 @@ impl Model {
 }
 
 fn contains_other_fields(rendered: &str, current_field: &str, sentinel: &str) -> bool {
-    let pattern = format!(r"(?!{field}\b)\b(\w)*{sentinel}+", field = current_field, sentinel = sentinel);
+    let pattern = format!(
+        r"(?!{field}\b)\b(\w)*{sentinel}+",
+        field = current_field,
+        sentinel = sentinel
+    );
     Regex::new(&pattern)
         .unwrap()
         .is_match(rendered)

@@ -4,56 +4,60 @@
 
 // Re-export core types and functions
 pub use genanki_core::{
+    // Configuration
+    AnkiConfig,
+    Card,
+    Deck,
+    DeckConfig,
+    // Error types
+    Error,
+    Field,
+    FieldDefaults,
     // Core types
     Model,
-    Note, Card, Deck,
-    Field, Template,
-
-    // Configuration
-    AnkiConfig, ModelConfig, DeckConfig, FieldDefaults, ModelIds,
-
-    // Error types
-    Error, Result,
-
-    // Utilities
-    guid_for,
+    ModelConfig,
+    ModelIds,
 
     // ModelType from both model and config (they're the same)
     ModelType,
+    Note,
+    Result,
+
+    Template,
+
+    // Utilities
+    guid_for,
 };
 
 // Re-export storage types
 pub use genanki_storage::{
-    AnkiSchema, CollectionManager, Collection,
-    DeckDbEntry, ModelDbEntry,
-    SCHEMA_SQL, COL_SQL,
+    AnkiSchema, COL_SQL, Collection, CollectionManager, DeckDbEntry, ModelDbEntry, SCHEMA_SQL,
 };
 
 // Re-export builder types
 pub use genanki_builder::{
-    FieldBuilder, TemplateBuilder, ModelBuilder, NoteBuilder, DeckBuilder,
-    BasicModels,
+    BasicModels, DeckBuilder, FieldBuilder, ModelBuilder, NoteBuilder, TemplateBuilder,
 };
 
 // Re-export export types
-pub use genanki_export::{Package, PackageWriter, MediaFiles};
+pub use genanki_export::{MediaFiles, Package, PackageWriter};
 
 // ===== BACKWARD COMPATIBILITY =====
 // Re-export old API for compatibility
 
 pub mod builders {
-    pub use genanki_core::{Field, Template};
     pub use genanki_builder::{FieldBuilder, TemplateBuilder};
+    pub use genanki_core::{Field, Template};
 }
 
 pub mod constants {
-    pub use genanki_storage::{SCHEMA_SQL as APKG_SCHEMA, COL_SQL as APKG_COL};
+    pub use genanki_storage::{COL_SQL as APKG_COL, SCHEMA_SQL as APKG_SCHEMA};
 }
 
-pub use genanki_core as core;
-pub use genanki_storage as storage;
 pub use genanki_builder as builder;
+pub use genanki_core as core;
 pub use genanki_export as export;
+pub use genanki_storage as storage;
 
 /// Basic model (backward compatible)
 pub fn basic_model() -> Model {
@@ -77,7 +81,9 @@ pub fn basic_and_reversed_card_model() -> Model {
                 .qfmt("{{Back}}")
                 .afmt("{{FrontSide}}\n\n<hr id=answer>\n\n{{Front}}"),
         ],
-        Some(".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n"),
+        Some(
+            ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n",
+        ),
         None,
         None,
         None,
@@ -103,7 +109,9 @@ pub fn basic_optional_reversed_card_model() -> Model {
                 .qfmt("{{#AddReverse}}{{Back}}{{/AddReverse}}")
                 .afmt("{{FrontSide}}\n\n<hr id=answer>\n\n{{Front}}"),
         ],
-        Some(".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n"),
+        Some(
+            ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n",
+        ),
         None,
         None,
         None,
@@ -120,10 +128,14 @@ pub fn basic_type_in_the_answer_model() -> Model {
             Field::new("Front").font("Arial"),
             Field::new("Back").font("Arial"),
         ],
-        vec![Template::new("Card 1")
-            .qfmt("{{Front}}\n\n{{type:Back}}")
-            .afmt("{{Front}}\n\n<hr id=answer>\n\n{{type:Back}}")],
-        Some(".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n"),
+        vec![
+            Template::new("Card 1")
+                .qfmt("{{Front}}\n\n{{type:Back}}")
+                .afmt("{{Front}}\n\n<hr id=answer>\n\n{{type:Back}}"),
+        ],
+        Some(
+            ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n",
+        ),
         None,
         None,
         None,

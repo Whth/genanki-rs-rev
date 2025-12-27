@@ -20,14 +20,12 @@ pub fn write_deck_to_db(
     deck: &Deck,
     transaction: &Transaction,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let decks_json: String = transaction.query_row("SELECT decks FROM col", [], |row| row.get(0))?;
+    let decks_json: String =
+        transaction.query_row("SELECT decks FROM col", [], |row| row.get(0))?;
     let mut decks: serde_json::Map<String, serde_json::Value> = serde_json::from_str(&decks_json)?;
 
     let deck_entry = deck_to_db_entry(deck);
-    decks.insert(
-        deck.id.to_string(),
-        serde_json::to_value(&deck_entry)?,
-    );
+    decks.insert(deck.id.to_string(), serde_json::to_value(&deck_entry)?);
 
     transaction.execute(
         "UPDATE col SET decks = ?",

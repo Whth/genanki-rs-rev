@@ -2,17 +2,16 @@
 //!
 //! This crate handles all database operations and serialization for Anki packages.
 
-pub mod schema;
+pub mod cards;
+pub mod collection;
+pub mod decks;
 pub mod models;
 pub mod notes;
-pub mod cards;
-pub mod decks;
-pub mod collection;
+pub mod schema;
 
 // Re-exports from schema
 pub use schema::{
-    AnkiSchema, SCHEMA_SQL, COL_SQL,
-    DeckDbEntry, ModelDbEntry, FieldDbEntry, TemplateDbEntry
+    AnkiSchema, COL_SQL, DeckDbEntry, FieldDbEntry, ModelDbEntry, SCHEMA_SQL, TemplateDbEntry,
 };
 
 // Re-exports from modules
