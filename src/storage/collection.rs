@@ -1,5 +1,6 @@
 //! Collection management
 
+use crate::core::Error;
 use rusqlite::{Connection, Result as SqlResult};
 use std::path::Path;
 
@@ -22,7 +23,7 @@ impl CollectionManager {
     }
 
     /// Initialize with Anki schema
-    pub fn init_schema(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn init_schema(&mut self) -> Result<(), Error> {
         crate::storage::schema::AnkiSchema::init_db(&mut self.conn)?;
         Ok(())
     }

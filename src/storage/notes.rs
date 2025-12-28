@@ -1,6 +1,6 @@
 //! Note database operations
 
-use crate::core::Note;
+use crate::core::{Error, Note};
 use rusqlite::{Transaction, params};
 use std::ops::RangeFrom;
 
@@ -11,7 +11,7 @@ pub fn write_note_to_db(
     timestamp: f64,
     _deck_id: i64,
     id_gen: &mut RangeFrom<usize>,
-) -> Result<i64, Box<dyn std::error::Error>> {
+) -> Result<i64, Error> {
     note.check_invalid_html();
 
     let note_id = id_gen.next().expect("Range overflowed!") as i64;

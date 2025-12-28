@@ -1,6 +1,6 @@
 //! Card database operations
 
-use crate::core::Card;
+use crate::core::{Card, Error};
 use rusqlite::{Transaction, params};
 use std::ops::RangeFrom;
 
@@ -12,7 +12,7 @@ pub fn write_card_to_db(
     deck_id: i64,
     note_id: i64,
     id_gen: &mut RangeFrom<usize>,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<(), Error> {
     let queue = card.queue_value();
     transaction.execute(
         "INSERT INTO cards VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",

@@ -1,6 +1,6 @@
 //! Deck database operations
 
-use crate::core::Deck;
+use crate::core::{Deck, Error};
 use crate::storage::schema::DeckDbEntry;
 use rusqlite::{Transaction, params};
 use serde_json;
@@ -16,10 +16,7 @@ pub fn deck_to_db_entry(deck: &Deck) -> DeckDbEntry {
 }
 
 /// Write deck to database
-pub fn write_deck_to_db(
-    deck: &Deck,
-    transaction: &Transaction,
-) -> Result<(), Box<dyn std::error::Error>> {
+pub fn write_deck_to_db(deck: &Deck, transaction: &Transaction) -> Result<(), Error> {
     let decks_json: String =
         transaction.query_row("SELECT decks FROM col", [], |row| row.get(0))?;
     let mut decks: serde_json::Map<String, serde_json::Value> = serde_json::from_str(&decks_json)?;

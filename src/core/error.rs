@@ -14,17 +14,12 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[non_exhaustive]
 pub enum Error {
     /// Database-related errors
-    ///
-    /// Currently wraps `rusqlite::Error` but is type-erased to allow
-    /// changing the database library in the future.
     #[error("Database error: {0}")]
-    Database(Box<dyn std::error::Error + Send + Sync>),
+    Database(#[from] rusqlite::Error),
 
     /// JSON parsing errors
-    ///
-    /// Currently wraps `serde_json::Error` but is type-erased.
     #[error("JSON error: {0}")]
-    Json(Box<dyn std::error::Error + Send + Sync>),
+    Json(#[from] serde_json::Error),
 
     /// Template formatting errors
     #[error(
@@ -45,20 +40,16 @@ pub enum Error {
     Io(#[from] IoError),
 
     /// Template rendering errors
-    ///
-    /// Currently wraps `ramhorns::Error` but is type-erased.
     #[error("Template rendering error: {0}")]
-    TemplateRendering(Box<dyn std::error::Error + Send + Sync>),
+    TemplateRendering(#[from] ramhorns::Error),
 
     /// System time errors
     #[error("System time error: {0}")]
     SystemTime(#[from] std::time::SystemTimeError),
 
     /// Zip file errors
-    ///
-    /// Currently wraps `zip::result::ZipError` but is type-erased.
     #[error("Zip error: {0}")]
-    Zip(Box<dyn std::error::Error + Send + Sync>),
+    Zip(#[from] zip::result::ZipError),
 
     /// Configuration errors
     #[error("Configuration error: {0}")]
@@ -67,54 +58,6 @@ pub enum Error {
     /// Validation errors
     #[error("Validation error: {0}")]
     Validation(String),
-}
-
-impl Error {
-    /// Create a database error from any error type
-    pub fn database<E: std::error::Error + Send + Sync + 'static>(err: E) -> Self {
-        Error::Database(Box::new(err))
-    }
-
-    /// Create a JSON error from any error type
-    pub fn json<E: std::error::Error + Send + Sync + 'static>(err: E) -> Self {
-        Error::Json(Box::new(err))
-    }
-
-    /// Create a template rendering error from any error type
-    pub fn template<E: std::error::Error + Send + Sync + 'static>(err: E) -> Self {
-        Error::TemplateRendering(Box::new(err))
-    }
-
-    /// Create a zip error from any error type
-    pub fn zip<E: std::error::Error + Send + Sync + 'static>(err: E) -> Self {
-        Error::Zip(Box::new(err))
-    }
-}
-
-// From implementations for common error types
-impl From<rusqlite::Error> for Error {
-    fn from(err: rusqlite::Error) -> Self {
-        Error::Database(Box::new(err))
-    }
-}
-
-impl From<serde_json::Error> for Error {
-    fn from(err: serde_json::Error) -> Self {
-        Error::Json(Box::new(err))
-    }
-}
-
-impl From<ramhorns::Error> for Error {
-    fn from(err: ramhorns::Error) -> Self {
-        Error::TemplateRendering(Box::new(err))
-    }
-}
-
-#[cfg(feature = "export")]
-impl From<zip::result::ZipError> for Error {
-    fn from(err: zip::result::ZipError) -> Self {
-        Error::Zip(Box::new(err))
-    }
 }
 
 #[cfg(test)]

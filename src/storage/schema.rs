@@ -3,6 +3,7 @@
 //! This module contains the SQL DDL for creating Anki database structures
 //! and the default collection data.
 
+use crate::core::Error;
 use serde::{Deserialize, Serialize};
 
 /// Anki database schema
@@ -27,7 +28,7 @@ impl AnkiSchema {
     }
 
     /// Initialize a database with the Anki schema
-    pub fn init_db(conn: &mut rusqlite::Connection) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn init_db(conn: &mut rusqlite::Connection) -> Result<(), Error> {
         conn.execute_batch(SCHEMA_SQL)?;
         conn.execute_batch(COL_SQL)?;
         Ok(())

@@ -90,7 +90,6 @@ impl Deck {
         &self.models
     }
 
-
     pub fn models(&self) -> Vec<&Model> {
         self.models.values().collect()
     }

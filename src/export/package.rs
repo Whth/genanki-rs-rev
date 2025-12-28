@@ -1,8 +1,8 @@
 //! Package creation and export
 
-use crate::core::Deck;
-use crate::storage::{cards, decks, models, notes, CollectionManager};
 use crate::ModelDbEntry;
+use crate::core::Deck;
+use crate::storage::{CollectionManager, cards, decks, models, notes};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Read, Seek, Write};
@@ -11,14 +11,14 @@ use std::path::Path;
 use std::time::{SystemTime, SystemTimeError};
 use tempfile::NamedTempFile;
 use thiserror::Error;
-use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
+use zip::write::SimpleFileOptions;
 
 /// Errors that can occur during package writing
 #[derive(Error, Debug)]
 pub enum PackageError {
     #[error("Database error: {0}")]
-    Database(Box<dyn std::error::Error>),
+    Database(#[from] rusqlite::Error),
 
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
@@ -33,27 +33,10 @@ pub enum PackageError {
     NoDecks,
 
     #[error("System time error: {0}")]
-    SystemTime(SystemTimeError),
-}
+    SystemTime(#[from] SystemTimeError),
 
-// From implementations
-impl From<rusqlite::Error> for PackageError {
-    fn from(err: rusqlite::Error) -> Self {
-        PackageError::Database(Box::new(err))
-    }
-}
-
-impl From<Box<dyn std::error::Error>> for PackageError {
-    fn from(err: Box<dyn std::error::Error>) -> Self {
-        PackageError::Database(err)
-    }
-}
-
-
-impl From<SystemTimeError> for PackageError {
-    fn from(err: SystemTimeError) -> Self {
-        PackageError::SystemTime(err)
-    }
+    #[error("Core error: {0}")]
+    Core(#[from] crate::core::Error),
 }
 
 /// Result type for package operations
@@ -93,7 +76,6 @@ impl Package {
             self.write_deck_to_db(deck, collection.connection_mut(), timestamp, &mut id_gen)?;
         }
 
-
         let package_file = File::create(path)?;
 
         let opt = SimpleFileOptions::default();
@@ -104,7 +86,8 @@ impl Package {
         zip.start_file(crate::constants::DATABASE_FILENAME, opt)?;
         zip.write_all(&buf)?;
 
-        let media_files_mapping_string = serde_json::to_string(&self.prepare_media_files_mapping())?;
+        let media_files_mapping_string =
+            serde_json::to_string(&self.prepare_media_files_mapping())?;
 
         zip.start_file(crate::constants::MEDIA_MAPPING_FILENAME, opt)?;
         zip.write_all(media_files_mapping_string.as_bytes())?;
@@ -115,15 +98,20 @@ impl Package {
             Ok::<(), PackageError>(())
         })?;
 
-
         Ok(())
     }
 
     fn prepare_media_files_mapping(&self) -> HashMap<String, String> {
-        self.media_files.keys().map(|name| (name.clone(), format!("{}/{}", crate::constants::MEDIA_DIRNAME, name)))
+        self.media_files
+            .keys()
+            .map(|name| {
+                (
+                    name.clone(),
+                    format!("{}/{}", crate::constants::MEDIA_DIRNAME, name),
+                )
+            })
             .collect()
     }
-
 
     fn write_deck_to_db(
         &self,
@@ -140,11 +128,10 @@ impl Package {
         // 2. Write models
         {
             // a. Read existing models from DB
-            let models_json_str: String = transaction
-                .query_row("SELECT models FROM col", [], |row| row.get(0))?;
+            let models_json_str: String =
+                transaction.query_row("SELECT models FROM col", [], |row| row.get(0))?;
 
-            let mut models: HashMap<i64, ModelDbEntry> =
-                serde_json::from_str(&models_json_str)?;
+            let mut models: HashMap<i64, ModelDbEntry> = serde_json::from_str(&models_json_str)?;
 
             // b. Convert each model to DB entry and insert into map
             for model in deck.models() {
@@ -155,8 +142,7 @@ impl Package {
 
             // c. Write back updated models JSON
             let models_json = serde_json::to_string(&models)?;
-            transaction
-                .execute("UPDATE col SET models = ?", [models_json])?;
+            transaction.execute("UPDATE col SET models = ?", [models_json])?;
         }
 
         // 3. Write notes and cards
