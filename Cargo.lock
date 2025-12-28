@@ -391,58 +391,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "genanki-builder"
-version = "0.2.0"
-dependencies = [
- "anyhow",
- "genanki-core",
-]
-
-[[package]]
-name = "genanki-core"
-version = "0.2.0"
-dependencies = [
- "anyhow",
- "blake3",
- "fancy-regex",
- "hex",
- "ramhorns",
- "rusqlite",
- "serde",
- "serde_json",
- "thiserror",
- "zip",
-]
-
-[[package]]
-name = "genanki-export"
-version = "0.2.0"
-dependencies = [
- "anyhow",
- "genanki-core",
- "genanki-storage",
- "rusqlite",
- "tempfile",
- "thiserror",
- "zip",
-]
-
-[[package]]
-name = "genanki-macros"
-version = "0.2.0"
-
-[[package]]
 name = "genanki-rs-rev"
 version = "0.2.0"
 dependencies = [
  "anyhow",
  "blake3",
  "fancy-regex",
- "genanki-builder",
- "genanki-core",
- "genanki-export",
- "genanki-macros",
- "genanki-storage",
  "hex",
  "pyo3",
  "ramhorns",
@@ -454,18 +408,6 @@ dependencies = [
  "thiserror",
  "uuid",
  "zip",
-]
-
-[[package]]
-name = "genanki-storage"
-version = "0.2.0"
-dependencies = [
- "anyhow",
- "genanki-core",
- "rusqlite",
- "serde",
- "serde_json",
- "thiserror",
 ]
 
 [[package]]

@@ -7,9 +7,6 @@ on:
     branches: [ master ]
 
 
-env:
-  CARGO_TERM_COLOR: always
-  PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
 permissions:
   contents: read
 jobs:
@@ -18,7 +15,6 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        python-version: [ '3.11', '3.12', '3.13' ]
 
     steps:
       - name: Checkout code
@@ -38,18 +34,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-registry-
 
-
       - name: Build
         run: cargo build
 
-      - uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: install anki
-        run: |
-          pip install anki
 
       - name: Run tests
         run: |
-          cargo test --lib
+          cargo test
