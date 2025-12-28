@@ -4,8 +4,8 @@ version = "0.2.0"
 edition = "2024"
 license-file = "LICENSE"
 repository = "https://github.com/Whth/genanki-rs-rev"
-authors = ["genanki-rs contributors"]
 description = "Crate to create decks for the open source flashcard platform Anki. Based on Python library genanki"
+
 
 [dependencies]
 # Core dependencies
@@ -25,7 +25,4 @@ anyhow = "1.0.100"
 default = []
 export = ["zip"]
 
-[dev-dependencies]
-pyo3 = { version = "0.27.2", features = ["auto-initialize"] }
-serial_test = "3.2.0"
-uuid = { version = "1.19", features = ["v4"] }
+
