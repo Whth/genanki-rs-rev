@@ -16,13 +16,13 @@ pub mod storage;
 
 // Re-export core types and functions
 pub use crate::core::{
-    AnkiConfig, Card, Deck, DeckConfig, Error, Field, FieldDefaults, Model, ModelConfig, ModelIds,
-    ModelType, Note, Result, Template, guid_for,
+    guid_for, AnkiConfig, Card, Deck, DeckConfig, Error, Field, FieldDefaults, Model, ModelConfig,
+    ModelIds, ModelType, Note, Result, Template,
 };
 
 // Re-export storage types
 pub use crate::storage::{
-    AnkiSchema, COL_SQL, Collection, CollectionManager, DeckDbEntry, ModelDbEntry, SCHEMA_SQL,
+    AnkiSchema, Collection, CollectionManager, DeckDbEntry, ModelDbEntry, COL_SQL, SCHEMA_SQL,
 };
 
 // Re-export builder types
@@ -31,7 +31,7 @@ pub use crate::builder::{
 };
 
 // Re-export export types
-pub use crate::export::{MediaFiles, Package, PackageWriter};
+pub use crate::export::{MediaFiles, Package, PackageError, PackageWriter};
 
 // ===== BACKWARD COMPATIBILITY =====
 // Re-export old API for compatibility

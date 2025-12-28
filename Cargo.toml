@@ -1,6 +1,6 @@
 [package]
 name = "genanki-rs-rev"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 license-file = "LICENSE"
 repository = "https://github.com/Whth/genanki-rs-rev"
