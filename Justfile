@@ -1,7 +1,10 @@
 #!/usr/bin/env just --justfile
 
-release:
-    cargo build --release    
-
 lint:
     cargo clippy
+
+publish:
+    cargo publish --registry crates-io
+
+test:
+    cargo test
