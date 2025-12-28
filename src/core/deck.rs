@@ -86,8 +86,13 @@ impl Deck {
     }
 
     /// Get all models
-    pub fn models(&self) -> &HashMap<i64, Model> {
+    pub fn models_items(&self) -> &HashMap<i64, Model> {
         &self.models
+    }
+
+
+    pub fn models(&self) -> Vec<&Model> {
+        self.models.values().collect()
     }
 
     /// Get number of notes

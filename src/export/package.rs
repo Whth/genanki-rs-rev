@@ -1,13 +1,18 @@
 //! Package creation and export
 
 use crate::core::Deck;
-use crate::storage::{CollectionManager, cards, decks, models, notes};
+use crate::storage::{cards, decks, models, notes, CollectionManager};
+use crate::ModelDbEntry;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::{Read, Seek, Write};
 use std::ops::RangeFrom;
 use std::path::Path;
 use std::time::{SystemTime, SystemTimeError};
 use tempfile::NamedTempFile;
 use thiserror::Error;
+use zip::write::SimpleFileOptions;
+use zip::ZipWriter;
 
 /// Errors that can occur during package writing
 #[derive(Error, Debug)]
@@ -16,10 +21,13 @@ pub enum PackageError {
     Database(Box<dyn std::error::Error>),
 
     #[error("I/O error: {0}")]
-    Io(std::io::Error),
+    Io(#[from] std::io::Error),
 
     #[error("Zip error: {0}")]
-    Zip(String),
+    Zip(#[from] zip::result::ZipError),
+
+    #[error("Serde error: {0}")]
+    Serialize(#[from] serde_json::Error),
 
     #[error("No decks provided")]
     NoDecks,
@@ -41,11 +49,6 @@ impl From<Box<dyn std::error::Error>> for PackageError {
     }
 }
 
-impl From<std::io::Error> for PackageError {
-    fn from(err: std::io::Error) -> Self {
-        PackageError::Io(err)
-    }
-}
 
 impl From<SystemTimeError> for PackageError {
     fn from(err: SystemTimeError) -> Self {
@@ -73,8 +76,10 @@ impl Package {
     }
 
     /// Write to a file
-    pub fn write_to_file<P: AsRef<Path>>(&self, _path: P) -> Result<()> {
-        let mut collection = CollectionManager::memory()?;
+    pub fn write_to_file<P: AsRef<Path>>(self, path: P) -> Result<()> {
+        let mut temp_file = NamedTempFile::new()?;
+
+        let mut collection = CollectionManager::open(&temp_file)?;
         collection.init_schema()?;
 
         // Write decks, models, notes, and cards
@@ -88,15 +93,37 @@ impl Package {
             self.write_deck_to_db(deck, collection.connection_mut(), timestamp, &mut id_gen)?;
         }
 
-        // Write to temp file then zip
-        let temp_db = NamedTempFile::new()?;
-        let _temp_db_path = temp_db.into_temp_path();
 
-        // Export database to temp file
-        // ... (implementation details)
+        let package_file = File::create(path)?;
+
+        let opt = SimpleFileOptions::default();
+        let mut zip = ZipWriter::new(package_file);
+        let mut buf = vec![];
+        temp_file.rewind()?;
+        temp_file.read_to_end(&mut buf)?;
+        zip.start_file(crate::constants::DATABASE_FILENAME, opt)?;
+        zip.write_all(&buf)?;
+
+        let media_files_mapping_string = serde_json::to_string(&self.prepare_media_files_mapping())?;
+
+        zip.start_file(crate::constants::MEDIA_MAPPING_FILENAME, opt)?;
+        zip.write_all(media_files_mapping_string.as_bytes())?;
+
+        self.media_files.iter().try_for_each(|(name, data)| {
+            zip.start_file(format!("{}/{name}", crate::constants::MEDIA_DIRNAME), opt)?;
+            zip.write_all(data)?;
+            Ok::<(), PackageError>(())
+        })?;
+
 
         Ok(())
     }
+
+    fn prepare_media_files_mapping(&self) -> HashMap<String, String> {
+        self.media_files.keys().map(|name| (name.clone(), format!("{}/{}", crate::constants::MEDIA_DIRNAME, name)))
+            .collect()
+    }
+
 
     fn write_deck_to_db(
         &self,
@@ -107,20 +134,34 @@ impl Package {
     ) -> Result<()> {
         let transaction = conn.transaction()?;
 
-        // Write deck
+        // 1. Write deck
         decks::write_deck_to_db(deck, &transaction)?;
 
-        // Write models
-        for (_, model) in deck.models() {
-            let mut model_clone = model.clone();
-            let _db_entry = models::model_to_db_entry(&mut model_clone, timestamp, deck.id);
-            // Write model to database...
+        // 2. Write models
+        {
+            // a. Read existing models from DB
+            let models_json_str: String = transaction
+                .query_row("SELECT models FROM col", [], |row| row.get(0))?;
+
+            let mut models: HashMap<i64, ModelDbEntry> =
+                serde_json::from_str(&models_json_str)?;
+
+            // b. Convert each model to DB entry and insert into map
+            for model in deck.models() {
+                let mut model_clone = model.clone(); // or avoid clone if possible
+                let db_entry = models::model_to_db_entry(&mut model_clone, timestamp, deck.id);
+                models.insert(model.id, db_entry);
+            }
+
+            // c. Write back updated models JSON
+            let models_json = serde_json::to_string(&models)?;
+            transaction
+                .execute("UPDATE col SET models = ?", [models_json])?;
         }
 
-        // Write notes and cards
+        // 3. Write notes and cards
         for note in deck.notes() {
             let note_id = notes::write_note_to_db(note, &transaction, timestamp, deck.id, id_gen)?;
-
             for card in note.cards() {
                 cards::write_card_to_db(card, &transaction, timestamp, deck.id, note_id, id_gen)?;
             }

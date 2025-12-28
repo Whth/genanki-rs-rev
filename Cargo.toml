@@ -22,7 +22,7 @@ zip = { version = "7.0.0", optional = true }
 anyhow = "1.0.100"
 
 [features]
-default = []
+default = ["export"]
 export = ["zip"]
 
 
