@@ -1,6 +1,6 @@
 //! Package integration tests
 
-use genanki_rs_rev::{basic_model, Deck, Error, MediaFiles, Package};
+use genanki_rs_rev::{Deck, MediaFiles, Package};
 
 #[test]
 fn test_package_new_with_deck() {

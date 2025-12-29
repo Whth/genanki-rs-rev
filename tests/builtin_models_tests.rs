@@ -1,12 +1,8 @@
 //! Built-in models integration tests
 
 use genanki_rs_rev::{
-    basic_model,
-    basic_and_reversed_card_model,
-    basic_optional_reversed_card_model,
-    basic_type_in_the_answer_model,
-    cloze_model,
-    Model, Note, Error,
+    Error, Model, Note, basic_and_reversed_card_model, basic_model,
+    basic_optional_reversed_card_model, basic_type_in_the_answer_model, cloze_model,
 };
 
 #[test]
@@ -80,10 +76,7 @@ fn test_cloze_model_generates_note() -> Result<(), Error> {
 #[test]
 fn test_cloze_model_with_multiple_clozes() -> Result<(), Error> {
     let model = cloze_model();
-    let note = Note::new(
-        model,
-        vec!["{{c1::First}} and {{c2::Second}} clozes."],
-    )?;
+    let note = Note::new(model, vec!["{{c1::First}} and {{c2::Second}} clozes."])?;
     assert!(!note.cards().is_empty());
     Ok(())
 }

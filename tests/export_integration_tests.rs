@@ -2,12 +2,14 @@
 //!
 //! These tests verify that packages can be created and exported correctly.
 
-use genanki_rs_rev::{basic_model, cloze_model, Deck, Model, Note, Field, Template};
+use genanki_rs_rev::{basic_model, cloze_model, Deck, Field, Model, Note, Template};
 use std::fs::File;
 use std::io::Read;
 use tempfile::TempDir;
 
-fn create_package_result(deck: Deck) -> Result<genanki_rs_rev::Package, genanki_rs_rev::export::package::PackageError> {
+fn create_package_result(
+    deck: Deck,
+) -> Result<genanki_rs_rev::Package, genanki_rs_rev::Error> {
     genanki_rs_rev::Package::new(vec![deck], std::collections::HashMap::new())
 }
 
@@ -35,7 +37,11 @@ fn test_package_write_with_notes() {
     let model = basic_model();
 
     for i in 0..5 {
-        let note = Note::new(model.clone(), vec![&format!("Question {}", i), &format!("Answer {}", i)]).unwrap();
+        let note = Note::new(
+            model.clone(),
+            vec![&format!("Question {}", i), &format!("Answer {}", i)],
+        )
+            .unwrap();
         deck.add_note(note);
     }
 
@@ -93,7 +99,8 @@ fn test_package_multiple_decks() {
     let deck1 = Deck::new(1000, "Deck 1", "First deck");
     let deck2 = Deck::new(2000, "Deck 2", "Second deck");
 
-    let package = genanki_rs_rev::Package::new(vec![deck1, deck2], std::collections::HashMap::new()).unwrap();
+    let package =
+        genanki_rs_rev::Package::new(vec![deck1, deck2], std::collections::HashMap::new()).unwrap();
     package.write_to_file(&output_path).unwrap();
 
     assert!(output_path.exists());
@@ -144,7 +151,8 @@ fn test_package_with_tags() {
         None,
         Some(vec!["programming", "rust", "testing"]),
         None,
-    ).unwrap();
+    )
+        .unwrap();
 
     let mut deck = Deck::new(7777, "Tags Test", "Test tags");
     deck.add_note(note);
@@ -227,7 +235,8 @@ fn test_package_with_cloze_notes() {
     let note = Note::new(
         cloze,
         vec!["The capital of {{c1::France}} is {{c2::Paris}}."],
-    ).unwrap();
+    )
+        .unwrap();
 
     let mut deck = Deck::new(3333, "Cloze Test", "Test cloze notes");
     deck.add_note(note);

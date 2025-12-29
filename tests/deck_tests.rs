@@ -1,6 +1,6 @@
 //! Deck integration tests
 
-use genanki_rs_rev::{basic_model, Deck, Field, Model, Note, Template, Error};
+use genanki_rs_rev::{Deck, Error, Field, Model, Note, Template, basic_model};
 
 #[test]
 fn test_deck_new() {
@@ -117,7 +117,10 @@ fn test_deck_num_notes() -> Result<(), Error> {
     let mut deck = Deck::new(1234, "Test", "");
     let model = basic_model();
     for i in 0..5 {
-        deck.add_note(Note::new(model.clone(), vec![&format!("Q{}", i), &format!("A{}", i)])?);
+        deck.add_note(Note::new(
+            model.clone(),
+            vec![&format!("Q{}", i), &format!("A{}", i)],
+        )?);
     }
     assert_eq!(deck.num_notes(), 5);
     Ok(())
@@ -126,8 +129,18 @@ fn test_deck_num_notes() -> Result<(), Error> {
 #[test]
 fn test_deck_num_models() -> Result<(), Error> {
     let mut deck = Deck::new(1234, "Test", "");
-    let model1 = Model::new(100, "Model1", vec![Field::new("F")], vec![Template::new("C")]);
-    let model2 = Model::new(200, "Model2", vec![Field::new("F")], vec![Template::new("C")]);
+    let model1 = Model::new(
+        100,
+        "Model1",
+        vec![Field::new("F")],
+        vec![Template::new("C")],
+    );
+    let model2 = Model::new(
+        200,
+        "Model2",
+        vec![Field::new("F")],
+        vec![Template::new("C")],
+    );
 
     deck.add_note(Note::new(model1, vec!["Q"])?);
     deck.add_note(Note::new(model2.clone(), vec!["Q"])?);

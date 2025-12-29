@@ -4,9 +4,9 @@
 
 use crate::core::card::Card;
 use crate::core::config::FIELD_SEPARATOR_STR;
-use crate::core::error::{Error, Result};
 use crate::core::guid::guid_for;
 use crate::core::model::{Model, ModelType};
+use crate::error::{Error, Result};
 use fancy_regex::Regex;
 use std::collections::HashSet;
 use std::str::FromStr;

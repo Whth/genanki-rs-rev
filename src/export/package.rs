@@ -1,46 +1,19 @@
 //! Package creation and export
 
-use crate::ModelDbEntry;
 use crate::core::Deck;
 use crate::storage::{CollectionManager, cards, decks, models, notes};
+use crate::{Error, ModelDbEntry, Result};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Read, Seek, Write};
 use std::ops::RangeFrom;
 use std::path::Path;
-use std::time::{SystemTime, SystemTimeError};
+use std::time::SystemTime;
 use tempfile::NamedTempFile;
-use thiserror::Error;
 use zip::ZipWriter;
 use zip::write::SimpleFileOptions;
 
 /// Errors that can occur during package writing
-#[derive(Error, Debug)]
-pub enum PackageError {
-    #[error("Database error: {0}")]
-    Database(#[from] rusqlite::Error),
-
-    #[error("I/O error: {0}")]
-    Io(#[from] std::io::Error),
-
-    #[error("Zip error: {0}")]
-    Zip(#[from] zip::result::ZipError),
-
-    #[error("Serde error: {0}")]
-    Serialize(#[from] serde_json::Error),
-
-    #[error("No decks provided")]
-    NoDecks,
-
-    #[error("System time error: {0}")]
-    SystemTime(#[from] SystemTimeError),
-
-    #[error("Core error: {0}")]
-    Core(#[from] crate::core::Error),
-}
-
-/// Result type for package operations
-pub type Result<T> = std::result::Result<T, PackageError>;
 
 /// Package containing one or more decks
 #[allow(dead_code)]
@@ -53,7 +26,7 @@ impl Package {
     /// Create a new package
     pub fn new(decks: Vec<Deck>, media_files: HashMap<String, Vec<u8>>) -> Result<Self> {
         if decks.is_empty() {
-            return Err(PackageError::NoDecks);
+            return Err(Error::NoDecks);
         }
         Ok(Self { decks, media_files })
     }
@@ -95,7 +68,7 @@ impl Package {
         self.media_files.iter().try_for_each(|(name, data)| {
             zip.start_file(format!("{}/{name}", crate::constants::MEDIA_DIRNAME), opt)?;
             zip.write_all(data)?;
-            Ok::<(), PackageError>(())
+            Ok::<(), Error>(())
         })?;
 
         Ok(())

@@ -3,7 +3,7 @@
 //! A model defines the structure of notes, including fields and templates.
 
 use crate::core::config::ModelConfig;
-use crate::core::error::{Error, Result};
+use crate::error::{Error, Result};
 use fancy_regex::Regex;
 use ramhorns::Template as RamTemplate;
 use std::collections::HashMap;

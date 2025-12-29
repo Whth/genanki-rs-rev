@@ -58,6 +58,9 @@ pub enum Error {
     /// Validation errors
     #[error("Validation error: {0}")]
     Validation(String),
+
+    #[error("No decks provided")]
+    NoDecks,
 }
 
 #[cfg(test)]

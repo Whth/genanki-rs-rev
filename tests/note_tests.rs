@@ -1,13 +1,14 @@
 //! Note integration tests
 
-use genanki_rs_rev::{
-    basic_model, cloze_model, Field, Model, Note, Template, Error,
-};
+use genanki_rs_rev::{Error, Field, Model, Note, Template, basic_model, cloze_model};
 
 #[test]
 fn test_note_creation_with_basic_model() -> Result<(), Error> {
     let model = basic_model();
-    let note = Note::new(model, vec!["What is Rust?", "A systems programming language"])?;
+    let note = Note::new(
+        model,
+        vec!["What is Rust?", "A systems programming language"],
+    )?;
     assert_eq!(note.fields().len(), 2);
     Ok(())
 }
@@ -31,14 +32,21 @@ fn test_note_with_multiple_fields() -> Result<(), Error> {
             Field::new("Example"),
             Field::new("Notes"),
         ],
-        vec![Template::new("Card 1")
-            .qfmt("{{Term}}")
-            .afmt(r#"{{FrontSide}}<hr id="answer">{{Definition}}"#)],
+        vec![
+            Template::new("Card 1")
+                .qfmt("{{Term}}")
+                .afmt(r#"{{FrontSide}}<hr id="answer">{{Definition}}"#),
+        ],
     );
 
     let note = Note::new(
         model,
-        vec!["Rust", "A systems programming language", "cargo new my_project", "Memory safe"],
+        vec![
+            "Rust",
+            "A systems programming language",
+            "cargo new my_project",
+            "Memory safe",
+        ],
     )?;
     assert_eq!(note.fields().len(), 4);
     Ok(())
@@ -47,10 +55,7 @@ fn test_note_with_multiple_fields() -> Result<(), Error> {
 #[test]
 fn test_note_with_html_content() -> Result<(), Error> {
     let model = basic_model();
-    let note = Note::new(
-        model,
-        vec!["<b>Bold Question</b>", "<i>Italic Answer</i>"],
-    )?;
+    let note = Note::new(model, vec!["<b>Bold Question</b>", "<i>Italic Answer</i>"])?;
     assert!(note.fields()[0].contains("<b>"));
     assert!(note.fields()[1].contains("<i>"));
     Ok(())
@@ -89,13 +94,7 @@ fn test_note_empty_tags() -> Result<(), Error> {
 #[test]
 fn test_note_with_special_characters() -> Result<(), Error> {
     let model = basic_model();
-    let note = Note::new(
-        model,
-        vec![
-            "What is 1 + 1?",
-            "2 < 3 and 4 > 2",
-        ],
-    )?;
+    let note = Note::new(model, vec!["What is 1 + 1?", "2 < 3 and 4 > 2"])?;
     assert!(note.fields()[1].contains("<"));
     assert!(note.fields()[1].contains(">"));
     Ok(())
@@ -104,13 +103,7 @@ fn test_note_with_special_characters() -> Result<(), Error> {
 #[test]
 fn test_note_with_unicode() -> Result<(), Error> {
     let model = basic_model();
-    let note = Note::new(
-        model,
-        vec![
-            "What is 你好?",
-            "Hello in Chinese is 你好",
-        ],
-    )?;
+    let note = Note::new(model, vec!["What is 你好?", "Hello in Chinese is 你好"])?;
     assert!(note.fields()[0].contains("你好"));
     assert!(note.fields()[1].contains("你好"));
     Ok(())

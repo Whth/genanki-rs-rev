@@ -1,7 +1,7 @@
 //! Model integration tests
 
-use genanki_rs_rev::{Field, Model, Template, Error};
 use genanki_rs_rev::core::ModelType;
+use genanki_rs_rev::{Error, Field, Model, Template};
 
 #[test]
 fn test_model_creation() {
@@ -9,9 +9,7 @@ fn test_model_creation() {
         1234567890,
         "Test Model",
         vec![Field::new("Front"), Field::new("Back")],
-        vec![Template::new("Card 1")
-            .qfmt("{{Front}}")
-            .afmt("{{Back}}")],
+        vec![Template::new("Card 1").qfmt("{{Front}}").afmt("{{Back}}")],
     );
     assert_eq!(model.id, 1234567890);
     assert_eq!(model.name, "Test Model");
@@ -79,10 +77,7 @@ fn test_model_template_names() {
         1,
         "Test",
         vec![Field::new("F"), Field::new("B")],
-        vec![
-            Template::new("Front->Back"),
-            Template::new("Back->Front"),
-        ],
+        vec![Template::new("Front->Back"), Template::new("Back->Front")],
     );
     let template_names: Vec<&str> = model.templates.iter().map(|t| t.name.as_str()).collect();
     assert_eq!(template_names, vec!["Front->Back", "Back->Front"]);

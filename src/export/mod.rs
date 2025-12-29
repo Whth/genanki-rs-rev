@@ -7,4 +7,4 @@ pub mod package;
 
 // Re-exports
 pub use media::MediaFiles;
-pub use package::{Package, PackageError, PackageWriter, Result};
+pub use package::{Package, PackageWriter};
