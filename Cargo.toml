@@ -12,17 +12,21 @@ description = "Crate to create decks for the open source flashcard platform Anki
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.148"
 thiserror = "2.0.17"
-blake3 = "1.8.2"
+blake3 = { version = "1.8.2", default-features = false, features = ["pure"] }
 hex = "0.4.3"
 fancy-regex = "0.17.0"
 ramhorns = "1.0.1"
-rusqlite = { version = "0.38.0", features = ["bundled"] }
+rusqlite = { version = "0.40.1", default-features = false, features = ["ffi-sqlite-wasm-rs"] }
 tempfile = "3.24.0"
-zip = { version = "7.0.0", optional = true }
+zip = { version = "8", optional = true,default-features = false, features = [
+    "deflate64",
+    "deflate",
+    "lzma",
+    "time",
+    "zstd",
+] }
 anyhow = "1.0.100"
 
 [features]
 default = ["export"]
 export = ["zip"]
-
-
