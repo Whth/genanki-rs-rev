@@ -16,8 +16,7 @@ blake3 = { version = "1.8.2", default-features = false, features = ["pure"] }
 hex = "0.4.3"
 fancy-regex = "0.17.0"
 ramhorns = "1.0.1"
-rusqlite = { version = "0.40.1", default-features = false, features = ["ffi-sqlite-wasm-rs"] }
-tempfile = "3.24.0"
+rusqlite = { version = "0.40.1", default-features = false, features = ["ffi-sqlite-wasm-rs", "serialize"] }
 zip = { version = "8", optional = true,default-features = false, features = [
     "deflate64",
     "deflate",
@@ -26,6 +25,9 @@ zip = { version = "8", optional = true,default-features = false, features = [
     "zstd",
 ] }
 anyhow = "1.0.100"
+
+[dev-dependencies]
+tempfile = "3.24.0"
 
 [features]
 default = ["export"]

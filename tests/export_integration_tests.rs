@@ -2,14 +2,12 @@
 //!
 //! These tests verify that packages can be created and exported correctly.
 
-use genanki_rs_rev::{basic_model, cloze_model, Deck, Field, Model, Note, Template};
+use genanki_rs_rev::{Deck, Field, Model, Note, Template, basic_model, cloze_model};
 use std::fs::File;
 use std::io::Read;
 use tempfile::TempDir;
 
-fn create_package_result(
-    deck: Deck,
-) -> Result<genanki_rs_rev::Package, genanki_rs_rev::Error> {
+fn create_package_result(deck: Deck) -> Result<genanki_rs_rev::Package, genanki_rs_rev::Error> {
     genanki_rs_rev::Package::new(vec![deck], std::collections::HashMap::new())
 }
 
@@ -20,10 +18,11 @@ fn test_package_write_to_file() {
 
     let deck = Deck::new(1234, "Test Deck", "A test deck");
     let package = create_package_result(deck).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     assert!(output_path.exists());
-    // APKG files are ZIP archives, should be at least a few bytes
     let metadata = std::fs::metadata(&output_path).unwrap();
     assert!(metadata.len() > 100);
 }
@@ -41,14 +40,16 @@ fn test_package_write_with_notes() {
             model.clone(),
             vec![&format!("Question {}", i), &format!("Answer {}", i)],
         )
-            .unwrap();
+        .unwrap();
         deck.add_note(note);
     }
 
     assert_eq!(deck.num_notes(), 5);
 
     let package = create_package_result(deck).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     assert!(output_path.exists());
 }
@@ -66,7 +67,9 @@ fn test_package_write_with_media() {
     media.insert("image.png".to_string(), vec![0x89, 0x50, 0x4E, 0x47]); // PNG header
 
     let package = genanki_rs_rev::Package::new(vec![deck], media).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     assert!(output_path.exists());
 }
@@ -78,7 +81,9 @@ fn test_package_write_is_valid_zip() {
 
     let deck = Deck::new(1234, "Zip Test", "Test ZIP validity");
     let package = create_package_result(deck).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     // Verify it's a valid ZIP file by opening it with zip crate
     let file = File::open(&output_path).unwrap();
@@ -101,7 +106,9 @@ fn test_package_multiple_decks() {
 
     let package =
         genanki_rs_rev::Package::new(vec![deck1, deck2], std::collections::HashMap::new()).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     assert!(output_path.exists());
 }
@@ -134,7 +141,9 @@ fn test_package_with_custom_model() {
     deck.add_note(note);
 
     let package = create_package_result(deck).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     assert!(output_path.exists());
 }
@@ -152,13 +161,15 @@ fn test_package_with_tags() {
         Some(vec!["programming", "rust", "testing"]),
         None,
     )
-        .unwrap();
+    .unwrap();
 
     let mut deck = Deck::new(7777, "Tags Test", "Test tags");
     deck.add_note(note);
 
     let package = create_package_result(deck).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     assert!(output_path.exists());
 }
@@ -182,7 +193,9 @@ fn test_package_with_large_media() {
     media.insert("large_file.dat".to_string(), large_data);
 
     let package = genanki_rs_rev::Package::new(vec![deck], media).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     assert!(output_path.exists());
 }
@@ -190,12 +203,13 @@ fn test_package_with_large_media() {
 #[test]
 fn test_package_filename_special_chars() {
     let temp_dir = TempDir::new().unwrap();
-    // Create path with special characters (spaces, etc.)
     let output_path = temp_dir.path().join("test deck (special).apkg");
 
     let deck = Deck::new(9999, "Special", "Test special filename");
     let package = create_package_result(deck).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     assert!(output_path.exists());
 }
@@ -210,7 +224,9 @@ fn test_package_contains_database() {
     deck.add_note(Note::new(model, vec!["Q", "A"]).unwrap());
 
     let package = create_package_result(deck).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     // Open and verify database contents
     let file = File::open(&output_path).unwrap();
@@ -236,13 +252,15 @@ fn test_package_with_cloze_notes() {
         cloze,
         vec!["The capital of {{c1::France}} is {{c2::Paris}}."],
     )
-        .unwrap();
+    .unwrap();
 
     let mut deck = Deck::new(3333, "Cloze Test", "Test cloze notes");
     deck.add_note(note);
 
     let package = create_package_result(deck).unwrap();
-    package.write_to_file(&output_path).unwrap();
+    package
+        .write(File::create(&output_path).unwrap())
+        .unwrap();
 
     assert!(output_path.exists());
 }
