@@ -29,6 +29,13 @@ impl Package {
         Ok(Self { decks, media_files })
     }
 
+    /// Write to a file
+    pub fn write_to_file<P: AsRef<Path>>(self, path: P) -> Result<()> {
+        let writer = std::fs::File::create(path)?;
+        self.write(writer)?;
+        Ok(())
+    }
+
     /// Save the package to any writer.
     pub fn write<W: Write + Seek>(self, writer: W) -> Result<()> {
         let mut collection = CollectionManager::memory()?;
@@ -36,6 +43,11 @@ impl Package {
 
         // Write decks, models, notes, and cards
         let mut id_gen = 0..;
+
+        #[cfg(target_arch = "wasm32")]
+        let timestamp = js_sys::Date::now();
+
+        #[cfg(not(target_arch = "wasm32"))]
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs_f64()
