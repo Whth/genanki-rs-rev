@@ -41,7 +41,7 @@ impl Package {
         collection.init_schema()?;
 
         // Write decks, models, notes, and cards
-        let mut id_gen = 0..;
+        let mut id_gen = 1..;
 
         #[cfg(target_arch = "wasm32")]
         let timestamp = js_sys::Date::now();
