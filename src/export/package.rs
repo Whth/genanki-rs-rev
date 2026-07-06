@@ -4,7 +4,7 @@ use crate::core::Deck;
 use crate::storage::{CollectionManager, cards, decks, models, notes};
 use crate::{Error, ModelDbEntry, Result};
 use std::collections::HashMap;
-use std::io::{Seek, Write};
+use std::io::Write;
 use std::ops::RangeFrom;
 use std::path::Path;
 use zip::ZipWriter;
@@ -36,7 +36,7 @@ impl Package {
     }
 
     /// Save the package to any writer.
-    pub fn write<W: Write + Seek>(self, writer: W) -> Result<()> {
+    pub fn write<W: Write>(self, writer: W) -> Result<()> {
         let mut collection = CollectionManager::memory()?;
         collection.init_schema()?;
 
@@ -57,7 +57,7 @@ impl Package {
         }
 
         let opt = SimpleFileOptions::default();
-        let mut zip = ZipWriter::new(writer);
+        let mut zip = ZipWriter::new_stream(writer);
         let db_bytes = collection.connection().serialize(rusqlite::MAIN_DB)?;
 
         zip.start_file(crate::constants::DATABASE_FILENAME, opt)?;
