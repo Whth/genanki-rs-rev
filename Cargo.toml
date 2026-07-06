@@ -9,22 +9,21 @@ description = "Crate to create decks for the open source flashcard platform Anki
 
 [dependencies]
 # Core dependencies
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0.148"
-thiserror = "2.0.17"
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+serde_json = {version="1.0.148",default-features=false,features=["std"]}
+thiserror = {version="2.0.17",default-features=false}
 blake3 = { version = "1.8.2", default-features = false, features = ["pure"] }
-hex = "0.4.3"
-fancy-regex = "0.17.0"
-ramhorns = "1.0.1"
+hex = {version="0.4.3",default-features=false,features=["std"]}
+ramhorns = {version="1.0.1",default-features=false}
 rusqlite = { version = "0.40.1", default-features = false, features = ["ffi-sqlite-wasm-rs", "serialize"] }
-zip = { version = "8", optional = true,default-features = false, features = [
-    "deflate",
-] }
-anyhow = "1.0.100"
+zip = { version = "8", optional = true,default-features = false,features = ["deflate"]}
+anyhow = {version="1.0.100",default-features=false}
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+fancy-regex = {version="0.17.0"}
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-js-sys = "0.3"
+js-sys = {version="0.3",default-features=false}
 [dev-dependencies]
-tempfile = "3.24.0"
+tempfile = {version="3.24.0",default-features=false}
 
 [features]
 default = ["export"]

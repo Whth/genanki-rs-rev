@@ -18,11 +18,10 @@ fn test_package_write_to_file() {
 
     let deck = Deck::new(1234, "Test Deck", "A test deck");
     let package = create_package_result(deck).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     assert!(output_path.exists());
+    // APKG files are ZIP archives, should be at least a few bytes
     let metadata = std::fs::metadata(&output_path).unwrap();
     assert!(metadata.len() > 100);
 }
@@ -47,9 +46,7 @@ fn test_package_write_with_notes() {
     assert_eq!(deck.num_notes(), 5);
 
     let package = create_package_result(deck).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     assert!(output_path.exists());
 }
@@ -67,9 +64,7 @@ fn test_package_write_with_media() {
     media.insert("image.png".to_string(), vec![0x89, 0x50, 0x4E, 0x47]); // PNG header
 
     let package = genanki_rs_rev::Package::new(vec![deck], media).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     assert!(output_path.exists());
 }
@@ -81,9 +76,7 @@ fn test_package_write_is_valid_zip() {
 
     let deck = Deck::new(1234, "Zip Test", "Test ZIP validity");
     let package = create_package_result(deck).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     // Verify it's a valid ZIP file by opening it with zip crate
     let file = File::open(&output_path).unwrap();
@@ -106,9 +99,7 @@ fn test_package_multiple_decks() {
 
     let package =
         genanki_rs_rev::Package::new(vec![deck1, deck2], std::collections::HashMap::new()).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     assert!(output_path.exists());
 }
@@ -141,9 +132,7 @@ fn test_package_with_custom_model() {
     deck.add_note(note);
 
     let package = create_package_result(deck).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     assert!(output_path.exists());
 }
@@ -167,9 +156,7 @@ fn test_package_with_tags() {
     deck.add_note(note);
 
     let package = create_package_result(deck).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     assert!(output_path.exists());
 }
@@ -193,9 +180,7 @@ fn test_package_with_large_media() {
     media.insert("large_file.dat".to_string(), large_data);
 
     let package = genanki_rs_rev::Package::new(vec![deck], media).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     assert!(output_path.exists());
 }
@@ -207,9 +192,7 @@ fn test_package_filename_special_chars() {
 
     let deck = Deck::new(9999, "Special", "Test special filename");
     let package = create_package_result(deck).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     assert!(output_path.exists());
 }
@@ -224,9 +207,7 @@ fn test_package_contains_database() {
     deck.add_note(Note::new(model, vec!["Q", "A"]).unwrap());
 
     let package = create_package_result(deck).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     // Open and verify database contents
     let file = File::open(&output_path).unwrap();
@@ -258,9 +239,7 @@ fn test_package_with_cloze_notes() {
     deck.add_note(note);
 
     let package = create_package_result(deck).unwrap();
-    package
-        .write(File::create(&output_path).unwrap())
-        .unwrap();
+    package.write(File::create(&output_path).unwrap()).unwrap();
 
     assert!(output_path.exists());
 }

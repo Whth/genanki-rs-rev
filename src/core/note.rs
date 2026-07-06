@@ -7,7 +7,6 @@ use crate::core::config::FIELD_SEPARATOR_STR;
 use crate::core::guid::guid_for;
 use crate::core::model::{Model, ModelType};
 use crate::error::{Error, Result};
-use fancy_regex::Regex;
 use std::collections::HashSet;
 use std::str::FromStr;
 
@@ -263,8 +262,9 @@ fn generate_cloze_cards(model: &Model, fields: &[String]) -> Vec<Card> {
 }
 
 /// Find all regex matches in a string
+#[cfg(not(target_arch = "wasm32"))]
 fn re_findall(pattern: &str, text: &str) -> Vec<String> {
-    let regex = Regex::new(pattern).expect("Invalid regex pattern");
+    let regex = fancy_regex::Regex::new(pattern).expect("Invalid regex pattern");
     regex
         .captures_iter(text)
         .filter_map(|m| m.ok())
@@ -278,6 +278,25 @@ fn re_findall(pattern: &str, text: &str) -> Vec<String> {
         .collect()
 }
 
+/// Find all regex matches in a string
+#[cfg(target_arch = "wasm32")]
+fn re_findall(pattern: &str, text: &str) -> Vec<String> {
+    let regex = js_sys::RegExp::new(pattern, "g");
+    let mut extracted = Vec::new();
+
+    while let Some(array) = regex.exec(text) {
+        for i in 1..array.length() {
+            let value = array.get(i);
+            if !value.is_undefined() && !value.is_null() {
+                if let Some(s) = value.as_string() {
+                    extracted.push(s);
+                }
+            }
+        }
+    }
+    extracted
+}
+
 /// Validate tags don't contain whitespace
 fn validate_tags(tags: &[String]) -> Result<()> {
     if tags.iter().any(|tag| tag.contains(' ')) {
@@ -288,13 +307,27 @@ fn validate_tags(tags: &[String]) -> Result<()> {
 }
 
 /// Find invalid HTML tags in a field
+#[cfg(not(target_arch = "wasm32"))]
 fn find_invalid_html_tags(field: &str) -> Vec<String> {
-    let regex = Regex::new(r"<(?!/?[a-z0-9]+(?: .*|/?)>)(?:.|\n)*?>").unwrap();
+    let regex = fancy_regex::Regex::new(r"<(?!/?[a-z0-9]+(?: .*|/?)>)(?:.|\n)*?>").unwrap();
     regex
         .find_iter(field)
         .filter_map(|m| m.ok())
         .map(|m| m.as_str().to_string())
         .collect()
+}
+
+/// Find invalid HTML tags in a field
+#[cfg(target_arch = "wasm32")]
+fn find_invalid_html_tags(field: &str) -> Vec<String> {
+    let regex = js_sys::RegExp::new(r"<(?!/?[a-z0-9]+(?: .*|/?)>)(?:.|\n)*?>", "g");
+    let mut matches = Vec::new();
+    while let Some(array) = regex.exec(field) {
+        if let Some(m) = array.get(0).as_string() {
+            matches.push(m);
+        }
+    }
+    matches
 }
 
 #[cfg(test)]

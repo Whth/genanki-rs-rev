@@ -7,7 +7,6 @@ use std::collections::HashMap;
 use std::io::{Seek, Write};
 use std::ops::RangeFrom;
 use std::path::Path;
-use std::time::SystemTime;
 use zip::ZipWriter;
 use zip::write::SimpleFileOptions;
 
@@ -48,8 +47,8 @@ impl Package {
         let timestamp = js_sys::Date::now();
 
         #[cfg(not(target_arch = "wasm32"))]
-        let timestamp = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)?
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::SystemTime::UNIX_EPOCH)?
             .as_secs_f64()
             * 1000.0;
 
@@ -75,8 +74,6 @@ impl Package {
             zip.write_all(data)?;
             Ok::<(), Error>(())
         })?;
-
-        zip.finish()?;
         Ok(())
     }
 
@@ -114,7 +111,7 @@ impl Package {
 
             // b. Convert each model to DB entry and insert into map
             for model in deck.models() {
-                let mut model_clone = model.clone();
+                let mut model_clone = model.clone(); // or avoid clone if possible
                 let db_entry = models::model_to_db_entry(&mut model_clone, timestamp, deck.id);
                 models.insert(model.id, db_entry);
             }

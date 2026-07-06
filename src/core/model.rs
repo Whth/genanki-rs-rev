@@ -4,7 +4,6 @@
 
 use crate::core::config::ModelConfig;
 use crate::error::{Error, Result};
-use fancy_regex::Regex;
 use ramhorns::Template as RamTemplate;
 use std::collections::HashMap;
 use std::fs::File;
@@ -277,10 +276,14 @@ fn contains_other_fields(rendered: &str, current_field: &str, sentinel: &str) ->
         field = current_field,
         sentinel = sentinel
     );
-    Regex::new(&pattern)
+    #[cfg(not(target_arch = "wasm32"))]
+    let is_match = fancy_regex::Regex::new(&pattern)
         .unwrap()
         .is_match(rendered)
-        .unwrap_or(false)
+        .unwrap_or(false);
+    #[cfg(target_arch = "wasm32")]
+    let is_match = js_sys::RegExp::new(&pattern, "").test(rendered);
+    is_match
 }
 
 #[cfg(test)]
